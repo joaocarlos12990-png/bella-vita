@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella Vita | Oficial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --pink: #ff4d6d; --fundo: #fffafa; --white: #ffffff; --green: #25d366; --pix: #32bcad; }
+        body { font-family: 'Poppins', sans-serif; background: var(--fundo); margin: 0; color: #333; }
+        
+        header { background: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--pink); text-decoration: none; font-weight: bold; }
+        .nav-right { display: flex; gap: 10px; align-items: center; }
+        .btn-nav { background: none; border: 2px solid var(--pink); color: var(--pink); padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        #adm-btn { background: #333; color: white; border: none; display: none; }
+        .cart-btn { background: var(--pink); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; }
+
+        #sidebar { position: fixed; right: -400px; top: 0; width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; padding: 30px; display: flex; flex-direction: column; box-sizing: border-box; }
+        #sidebar.active { right: 0; }
+        .cart-items { flex-grow: 1; overflow-y: auto; margin: 15px 0; border-top: 1px solid #eee; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f9f9f9; font-size: 14px; }
+        .del-item { color: #ccc; cursor: pointer; font-size: 18px; margin-left: 10px; }
+        .del-item:hover { color: var(--pink); }
+
+        .container { max-width: 1200px; margin: 40px auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; padding: 0 20px; }
+        .card { background: var(--white); border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #eee; }
+        .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
+
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 35px; border-radius: 25px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); z-index: 3000; width: 350px; display: none; }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(3px); }
+        #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 40px; box-sizing: border-box; overflow-y: auto; }
+
+        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .remove-link { color: var(--pink); cursor: pointer; font-size: 11px; text-decoration: underline; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<div id="overlay" onclick="closeAll()" style="display: block;"></div>
+
+<header>
+    <a href="#" class="logo">BELLA VITA</a>
+    <div class="nav-right">
+        <button class="btn-nav" id="adm-btn" onclick="abrirPainel()">Painel ADM</button>
+        <button class="btn-nav" id="user-display" onclick="openAuth()">Entrar</button>
+        <button class="cart-btn" onclick="toggleCart()">🛒 <span id="cart-counter">0</span></button>
+    </div>
+</header>
+
+<div id="modal-auth" class="modal" style="display: block;">
+    <h2 style="text-align: center; color: var(--pink); font-family: 'Playfair Display';">Bem-vinda</h2>
+    <input type="email" id="auth-email" class="input-field" placeholder="E-mail">
+    <input type="password" id="auth-pass" class="input-field" placeholder="Senha">
+    <button class="btn-main" style="width: 100%;" onclick="handleAuth()">ENTRAR NO SITE</button>
+</div>
+
+<div id="painel-adm">
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>Gerenciar Loja</h1>
+            <button class="btn-nav" onclick="fecharPainel()">Sair</button>
+        </div>
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 20px 0;">
+            <input type="text" id="new-name" class="input-field" placeholder="Nome">
+            <input type="number" id="new-price" class="input-field" placeholder="Preço">
+            <input type="text" id="new-img" class="input-field" placeholder="URL da Imagem">
+            <button class="btn-main" onclick="adicionarProduto()">ADICIONAR PRODUTO</button>
+        </div>
+        <div id="lista-adm-produtos"></div>
+    </div>
+</div>
+
+<div id="modal-pix" class="modal">
+    <h2 style="text-align: center; color: var(--pix);">Pagamento PIX</h2>
+    <div style="text-align: center;">
+        <img id="qrcode-real" src="" width="180" style="border: 1px solid #eee; border-radius: 10px;">
+        <p style="margin-top:10px;">Chave: <b>fv3029483@gmail.com</b></p>
+    </div>
+    <h3 style="text-align: center;">Total: R$ <span id="pix-total-val">0,00</span></h3>
+    <a id="btn-comprovante" target="_blank" class="btn-main" style="background: var(--green); text-decoration: none; display: block; padding: 10px;">ENVIAR COMPROVANTE</a>
+</div>
+
+<div id="sidebar">
+    <h2 style="font-family: 'Playfair Display';">Meu Carrinho</h2>
+    <div class="cart-items" id="lista-carrinho"></div>
+    
+    <div style="border-top: 1px solid #eee; padding-top: 10px;">
+        <div id="cupom-area">
+            <input type="text" id="cupom-input" class="input-field" placeholder="Cupom: BELLA5">
+            <button class="btn-main" style="padding: 8px; margin-bottom: 10px;" onclick="aplicarCupom()">APLICAR</button>
+        </div>
+        <div id="msg-cupom" style="background: #f0fff4; padding: 10px; border-radius: 10px; margin-bottom: 10px; display: none;">
+            <span style="color: var(--green); font-size: 13px; font-weight: 600;">✨ Cupom Ativo!</span>
+            <span class="remove-link" onclick="removerCupom()">Remover</span>
+        </div>
+        
+        <p style="font-size: 14px; color: #666;">Subtotal: <span style="float: right;">R$ <span id="sub-val">0,00</span></span></p>
+        <p id="linha-desc" style="display:none; color: var(--green); font-size: 14px;">Desconto (5%): <span style="float: right;">- R$ <span id="desc-val">0,00</span></span></p>
+        <p style="font-size: 18px; font-weight: bold;">Total: <span style="float: right; color: var(--pink);">R$ <span id="total-val">0,00</span></span></p>
+        
+        <button class="btn-main" style="width: 100%; background: var(--pix); margin-top: 10px;" onclick="abrirPagamento()">PAGAR COM PIX</button>
+    </div>
+</div>
+
+<div class="container" id="vitrine"></div>
+
+<script>
+    let subtotal = 0, itens = 0, carrinho = [], cupomAtivo = false;
+    let produtos = JSON.parse(localStorage.getItem('bella_prod')) || [
+        { id: 1, nome: "Sérum Rose", preco: 89.90, img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400" },
+        { id: 2, nome: "Batom Velvet", preco: 45.00, img: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400" }
+    ];
+
+    function renderizar() {
+        const v = document.getElementById('vitrine');
+        const adm = document.getElementById('lista-adm-produtos');
+        v.innerHTML = ""; adm.innerHTML = "";
+        produtos.forEach(p => {
+            v.innerHTML += `<div class="card"><img src="${p.img}"><h3>${p.nome}</h3><p>R$ ${p.preco.toFixed(2).replace('.',',')}</p><button class="btn-main" style="padding:10px" onclick="add(${p.id})">COMPRAR</button></div>`;
+            adm.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">${p.nome} <button onclick="removerProdutoBD(${p.id})" style="color:red; float:right; border:none; background:none; cursor:pointer;">Excluir</button></div>`;
+        });
+        localStorage.setItem('bella_prod', JSON.stringify(produtos));
+    }
+
+    function add(id) {
+        const prod = produtos.find(p => p.id === id);
+        carrinho.push({...prod, instanceId: Date.now()});
+        atualizarCarrinho();
+    }
+
+    function removerDoCarrinho(instanceId) {
+        carrinho = carrinho.filter(item => item.instanceId !== instanceId);
+        atualizarCarrinho();
+    }
+
+    function atualizarCarrinho() {
+        const lista = document.getElementById('lista-carrinho');
+        lista.innerHTML = "";
+        subtotal = 0;
+        
+        carrinho.forEach(item => {
+            subtotal += item.preco;
+            lista.innerHTML += `
+                <div class="item-row">
+                    <span>${item.nome}</span>
+                    <div>
+                        <b>R$ ${item.preco.toFixed(2).replace('.',',')}</b>
+                        <span class="del-item" onclick="removerDoCarrinho(${item.instanceId})">&times;</span>
+                    </div>
+                </div>`;
+        });
+        
+        document.getElementById('cart-counter').innerText = carrinho.length;
+        atualizarValores();
+    }
+
+    function aplicarCupom() {
+        if(document.getElementById('cupom-input').value.toUpperCase() === "BELLA5") {
+            cupomAtivo = true;
+            document.getElementById('cupom-area').style.display = 'none';
+            document.getElementById('msg-cupom').style.display = 'block';
+            atualizarValores();
+        } else { alert("Cupom inválido!"); }
+    }
+
+    function removerCupom() {
+        cupomAtivo = false;
+        document.getElementById('cupom-area').style.display = 'block';
+        document.getElementById('msg-cupom').style.display = 'none';
+        document.getElementById('cupom-input').value = "";
+        atualizarValores();
+    }
+
+    function atualizarValores() {
+        let desc = cupomAtivo ? (subtotal * 0.05) : 0;
+        let totalFinal = subtotal - desc;
+        
+        document.getElementById('sub-val').innerText = subtotal.toFixed(2).replace('.',',');
+        document.getElementById('desc-val').innerText = desc.toFixed(2).replace('.',',');
+        document.getElementById('total-val').innerText = totalFinal.toFixed(2).replace('.',',');
+        document.getElementById('linha-desc').style.display = cupomAtivo ? 'block' : 'none';
+    }
+
+    function abrirPagamento() {
+        if(carrinho.length === 0) return alert("Carrinho vazio!");
+        let final = document.getElementById('total-val').innerText;
+        document.getElementById('pix-total-val').innerText = final;
+        document.getElementById('qrcode-real').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=fv3029483@gmail.com`;
+        
+        let nomes = carrinho.map(i => i.nome).join(", ");
+        let msg = encodeURIComponent(`Olá! Fiz o pagamento de R$ ${final}.\nProdutos: ${nomes}`);
+        document.getElementById('btn-comprovante').href = `https://wa.me/556499923612?text=${msg}`;
+        
+        document.getElementById('modal-pix').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+    }
+
+    function handleAuth() {
+        const e = document.getElementById('auth-email').value, s = document.getElementById('auth-pass').value;
+        if(e === "feradm@gmail.com" && s === "27112010") {
+            document.getElementById('adm-btn').style.display = "block";
+            document.getElementById('user-display').innerText = "ADM Logado";
+            closeAll();
+        } else if(e && s) { closeAll(); }
+    }
+
+    function adicionarProduto() {
+        const n = document.getElementById('new-name').value, p = parseFloat(document.getElementById('new-price').value);
+        if(n && p) {
+            produtos.push({ id: Date.now(), nome: n, preco: p, img: document.getElementById('new-img').value || 'https://via.placeholder.com/150' });
+            renderizar();
+        }
+    }
+
+    function removerProdutoBD(id) { produtos = produtos.filter(p => p.id !== id); renderizar(); }
+    function toggleCart() { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; }
+    function closeAll() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('overlay').style.display = 'none'; document.getElementById('sidebar').classList.remove('active'); }
+    function openAuth() { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
+    function abrirPainel() { document.getElementById('painel-adm').style.display = 'block'; }
+    function fecharPainel() { document.getElementById('painel-adm').style.display = 'none'; }
+
+    renderizar();
+</script>
+</body>
+</html> 
