@@ -28,33 +28,31 @@
         .card { background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; }
         .card img { width: 100%; height: 180px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; }
 
-        /* --- VISUAL DA BARRA DE BRINDE --- */
-        .area-brinde {
-            padding: 15px 20px;
-            background: #fff;
-            border-bottom: 1px solid #eee;
-        }
-        .progress-container { 
-            background: #f0f0f0; 
-            border-radius: 50px; 
-            height: 12px; 
-            margin: 10px 0; 
-            overflow: hidden; 
-            border: 1px solid #eee;
-        }
-        .progress-bar { 
-            background: linear-gradient(90deg, var(--pink), #ff85a1); 
-            height: 100%; 
-            width: 0%; 
-            transition: 0.6s ease-in-out; 
-        }
+        /* ÁREA DA BARRA DE BRINDE */
+        .area-brinde { padding: 15px 20px; background: #fff; border-bottom: 1px solid #eee; }
+        .progress-container { background: #f0f0f0; border-radius: 50px; height: 12px; margin: 10px 0; overflow: hidden; border: 1px solid #eee; }
+        .progress-bar { background: linear-gradient(90deg, var(--pink), #ff85a1); height: 100%; width: 0%; transition: 0.6s ease-in-out; }
         #brinde-msg { font-size: 12px; font-weight: 600; color: #444; }
 
-        /* Seção Meus Pedidos */
-        .section-pedidos { max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; display: none; }
-        .status-box { margin-top: 20px; padding: 20px; border-radius: 15px; display: none; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 600; }
+        /* SEÇÕES ESCONDIDAS POR PADRÃO (O ajuste principal) */
+        .section-pedidos, #modal-auth, #painel-adm { display: none; }
 
-        /* Sidebar Carrinho */
+        /* Modal de Login (Ajustado para não vazar na tela) */
+        .modal { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; 
+            padding: 30px; border-radius: 25px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); z-index: 3000; 
+            width: 90%; max-width: 350px;
+        }
+
+        /* Painel ADM (Ocupa a tela toda quando aberto) */
+        #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; padding: 30px; overflow-y: auto; box-sizing: border-box; }
+
+        /* Overlay para escurecer o fundo */
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(2px); }
+
+        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+
         #sidebar { position: fixed; right: -100%; top: 0; width: 100%; max-width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; display: flex; flex-direction: column; }
         #sidebar.active { right: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
@@ -63,12 +61,6 @@
 
         .item-carrinho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
         .qtd-btn { background: #eee; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
-
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(2px); }
-        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-
-        #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 30px; overflow-y: auto; }
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 9999; }
     </style>
 </head>
@@ -88,11 +80,13 @@
 </header>
 
 <div id="view-pedidos" class="section-pedidos">
-    <h2>Acompanhar Pedido</h2>
-    <input type="email" id="search-email" class="input-field" placeholder="Digite seu e-mail">
-    <button class="btn-main" onclick="buscarPedido()">BUSCAR STATUS</button>
-    <div id="status-resultado" class="status-box"></div>
-    <button class="btn-nav" onclick="voltarLoja()" style="margin-top: 20px; width: 100%;">Voltar para a Loja</button>
+    <div style="padding: 20px; text-align: center;">
+        <h2>Acompanhar Pedido</h2>
+        <input type="email" id="search-email" class="input-field" placeholder="Digite seu e-mail">
+        <button class="btn-main" onclick="buscarPedido()">BUSCAR STATUS</button>
+        <div id="status-resultado" style="margin-top:20px; padding:15px; border-radius:10px; display:none;"></div>
+        <button class="btn-nav" onclick="voltarLoja()" style="margin-top: 20px; width: 100%;">Voltar para a Loja</button>
+    </div>
 </div>
 
 <div id="view-loja">
@@ -136,16 +130,13 @@
         <h2 style="margin:0;">Carrinho</h2>
         <button onclick="toggleCart()" style="border:none; background:none; font-size:24px;">✕</button>
     </div>
-    
     <div class="area-brinde">
         <div id="brinde-msg">Faltam R$ 150,00 para liberar 7% OFF!</div>
         <div class="progress-container">
             <div class="progress-bar" id="cart-progress"></div>
         </div>
     </div>
-
     <div class="cart-items" id="lista-carrinho"></div>
-    
     <div class="cart-footer">
         <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (BELLA7 para +R$150)">
         <div style="display: flex; gap: 5px; margin-bottom: 10px;">
@@ -203,18 +194,13 @@
         const totalTxt = document.getElementById('total-val');
         const bar = document.getElementById('cart-progress');
         const msg = document.getElementById('brinde-msg');
-        
         lista.innerHTML = ""; totalBruto = 0; let itens = 0;
-        
         carrinho.forEach((item, i) => {
             totalBruto += item.preco * item.qtd; itens += item.qtd;
             lista.innerHTML += `<div class="item-carrinho"><span>${item.nome} (x${item.qtd})</span><div><button class="qtd-btn" onclick="mudarQtd(${i},-1)">-</button> <button class="qtd-btn" onclick="mudarQtd(${i},1)">+</button></div></div>`;
         });
-
-        // Atualização da Barra
         let progresso = (totalBruto / 150) * 100;
         bar.style.width = Math.min(progresso, 100) + "%";
-        
         if(totalBruto < 150) {
             msg.innerHTML = `Faltam <b>R$ ${(150 - totalBruto).toFixed(2)}</b> para liberar 7% OFF!`;
             msg.style.color = "#444";
@@ -222,7 +208,6 @@
             msg.innerHTML = `🎉 PARABÉNS! Use o cupom <b>BELLA7</b>!`;
             msg.style.color = "var(--pink)";
         }
-
         const valorFinal = totalBruto - (totalBruto * (desconto / 100));
         totalTxt.innerText = valorFinal.toFixed(2).replace('.', ',');
         document.getElementById('cart-counter').innerText = itens;
@@ -231,14 +216,12 @@
     window.aplicarCupom = () => {
         const c = document.getElementById('cupom-input').value.trim().toUpperCase();
         const isAdmin = document.getElementById('adm-btn').style.display === "block";
-
         if (c === "BELLA7") {
             if (totalBruto >= 150) { desconto = 7; alert("Cupom BELLA7 aplicado!"); } 
             else { alert("Gaste mais R$ " + (150 - totalBruto).toFixed(2) + " para usar esse cupom!"); return; }
         } else if (c === "AMOVCFER" && isAdmin) { desconto = 100; } 
         else if (c === "BELLA5" || c === "FER5") { desconto = 5; }
         else { return alert("Cupom inválido!"); }
-        
         document.getElementById('btn-remover').style.display = "block";
         document.getElementById('btn-aplicar').disabled = true;
         atualizarCarrinhoUI();
@@ -253,7 +236,6 @@
         atualizarCarrinhoUI();
     }
 
-    // Funções Auxiliares (Mesmas de antes)
     window.mudarQtd = (i, n) => { carrinho[i].qtd += n; if(carrinho[i].qtd <= 0) carrinho.splice(i, 1); atualizarCarrinhoUI(); }
     window.removerCupom = () => { desconto = 0; document.getElementById('btn-remover').style.display = "none"; document.getElementById('btn-aplicar').disabled = false; atualizarCarrinhoUI(); }
     window.adicionarProduto = () => {
@@ -275,8 +257,8 @@
         if(!emailKey) return alert("Digite o e-mail.");
         get(child(ref(db), `pedidos/${emailKey}`)).then((snap) => {
             res.style.display = "block";
-            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; }
-            else { res.innerHTML = "❌ Pedido não encontrado."; res.style.background = "#fee2e2"; }
+            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; res.style.color = "#166534"; }
+            else { res.innerHTML = "❌ Pedido não encontrado."; res.style.background = "#fee2e2"; res.style.color = "#991b1b"; }
         });
     }
     window.atualizarStatusPedido = function() {
