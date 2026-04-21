@@ -25,34 +25,35 @@
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; padding: 0 15px; 
         }
 
-        .card { background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; }
+        .card { background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .card img { width: 100%; height: 180px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; }
 
-        /* ÁREA DA BARRA DE BRINDE */
+        /* Barra de Brinde */
         .area-brinde { padding: 15px 20px; background: #fff; border-bottom: 1px solid #eee; }
         .progress-container { background: #f0f0f0; border-radius: 50px; height: 12px; margin: 10px 0; overflow: hidden; border: 1px solid #eee; }
         .progress-bar { background: linear-gradient(90deg, var(--pink), #ff85a1); height: 100%; width: 0%; transition: 0.6s ease-in-out; }
         #brinde-msg { font-size: 12px; font-weight: 600; color: #444; }
 
-        /* SEÇÕES ESCONDIDAS POR PADRÃO (O ajuste principal) */
-        .section-pedidos, #modal-auth, #painel-adm { display: none; }
-
-        /* Modal de Login (Ajustado para não vazar na tela) */
+        /* MODAL DE LOGIN - CORREÇÃO TOTAL */
         .modal { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; 
-            padding: 30px; border-radius: 25px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); z-index: 3000; 
-            width: 90%; max-width: 350px;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: white; padding: 30px; border-radius: 25px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3); z-index: 3000; 
+            width: 90%; max-width: 350px; display: none; /* Começa escondido */
         }
 
-        /* Painel ADM (Ocupa a tela toda quando aberto) */
-        #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; padding: 30px; overflow-y: auto; box-sizing: border-box; }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 2500; backdrop-filter: blur(4px); }
 
-        /* Overlay para escurecer o fundo */
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(2px); }
+        /* Painel ADM */
+        #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 30px; overflow-y: auto; box-sizing: border-box; }
 
-        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        /* Estilos Gerais */
+        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
+        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
 
+        /* Sidebar Carrinho */
         #sidebar { position: fixed; right: -100%; top: 0; width: 100%; max-width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; display: flex; flex-direction: column; }
         #sidebar.active { right: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
@@ -62,6 +63,9 @@
         .item-carrinho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
         .qtd-btn { background: #eee; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 9999; }
+        
+        /* Seção Pedidos */
+        .section-pedidos { max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; display: none; }
     </style>
 </head>
 <body>
@@ -79,13 +83,29 @@
     </div>
 </header>
 
-<div id="view-pedidos" class="section-pedidos">
-    <div style="padding: 20px; text-align: center;">
-        <h2>Acompanhar Pedido</h2>
-        <input type="email" id="search-email" class="input-field" placeholder="Digite seu e-mail">
-        <button class="btn-main" onclick="buscarPedido()">BUSCAR STATUS</button>
-        <div id="status-resultado" style="margin-top:20px; padding:15px; border-radius:10px; display:none;"></div>
-        <button class="btn-nav" onclick="voltarLoja()" style="margin-top: 20px; width: 100%;">Voltar para a Loja</button>
+<div id="sidebar">
+    <div class="cart-header">
+        <h2 style="margin:0;">Carrinho</h2>
+        <button onclick="toggleCart()" style="border:none; background:none; font-size:24px; cursor:pointer;">✕</button>
+    </div>
+    <div class="area-brinde">
+        <div id="brinde-msg">Faltam R$ 150,00 para liberar 7% OFF!</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="cart-progress"></div>
+        </div>
+    </div>
+    <div class="cart-items" id="lista-carrinho"></div>
+    <div class="cart-footer">
+        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (BELLA7 para +R$150)">
+        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <button class="btn-nav" style="flex: 2; height: 40px;" id="btn-aplicar" onclick="aplicarCupom()">Aplicar</button>
+            <button class="btn-nav" style="flex: 1; height: 40px; border-color: #999; color: #999; display: none;" id="btn-remover" onclick="removerCupom()">Tirar</button>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <span>Total:</span>
+            <b style="font-size: 20px; color: var(--pink);">R$ <span id="total-val">0,00</span></b>
+        </div>
+        <button class="btn-main" style="background:var(--pix);" onclick="finalizarCompra()">FINALIZAR PIX</button>
     </div>
 </div>
 
@@ -93,14 +113,23 @@
     <div class="container" id="vitrine"></div>
 </div>
 
-<div id="modal-auth" class="modal">
+<div id="view-pedidos" class="section-pedidos">
+    <h2>Acompanhar Pedido</h2>
+    <input type="email" id="search-email" class="input-field" placeholder="Digite seu e-mail">
+    <button class="btn-main" onclick="buscarPedido()">BUSCAR STATUS</button>
+    <div id="status-resultado" style="margin-top:20px; padding:15px; border-radius:10px; display:none;"></div>
+    <button class="btn-nav" onclick="voltarLoja()" style="margin-top: 20px; width: 100%;">Voltar para a Loja</button>
+</div>
+
+<div id="modal-auth" class="modal" style="display: none;">
     <h2 style="text-align: center; margin-top: 0;">Login ADM</h2>
     <input type="email" id="auth-email" class="input-field" placeholder="E-mail">
     <input type="password" id="auth-pass" class="input-field" placeholder="Senha">
     <button class="btn-main" onclick="handleAuth()">ENTRAR</button>
+    <button class="btn-nav" onclick="closeAll()" style="width:100%; border:none; margin-top:10px;">Cancelar</button>
 </div>
 
-<div id="painel-adm">
+<div id="painel-adm" style="display: none;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <h1>Painel ADM</h1>
         <button class="btn-nav" onclick="fecharPainel()">Sair</button>
@@ -122,32 +151,6 @@
             <option value="Pedido entregue! ✨">Entregue</option>
         </select>
         <button class="btn-main" style="background:#333;" onclick="atualizarStatusPedido()">SALVAR STATUS</button>
-    </div>
-</div>
-
-<div id="sidebar">
-    <div class="cart-header">
-        <h2 style="margin:0;">Carrinho</h2>
-        <button onclick="toggleCart()" style="border:none; background:none; font-size:24px;">✕</button>
-    </div>
-    <div class="area-brinde">
-        <div id="brinde-msg">Faltam R$ 150,00 para liberar 7% OFF!</div>
-        <div class="progress-container">
-            <div class="progress-bar" id="cart-progress"></div>
-        </div>
-    </div>
-    <div class="cart-items" id="lista-carrinho"></div>
-    <div class="cart-footer">
-        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (BELLA7 para +R$150)">
-        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-            <button class="btn-nav" style="flex: 2; height: 40px;" id="btn-aplicar" onclick="aplicarCupom()">Aplicar</button>
-            <button class="btn-nav" style="flex: 1; height: 40px; border-color: #999; color: #999; display: none;" id="btn-remover" onclick="removerCupom()">Tirar</button>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <span>Total:</span>
-            <b style="font-size: 20px; color: var(--pink);">R$ <span id="total-val">0,00</span></b>
-        </div>
-        <button class="btn-main" style="background:var(--pix);" onclick="finalizarCompra()">FINALIZAR PIX</button>
     </div>
 </div>
 
@@ -213,6 +216,39 @@
         document.getElementById('cart-counter').innerText = itens;
     }
 
+    window.openAuth = () => { 
+        document.getElementById('modal-auth').style.display = 'block'; 
+        document.getElementById('overlay').style.display = 'block'; 
+    }
+
+    window.closeAll = () => { 
+        document.getElementById('modal-auth').style.display = 'none'; 
+        document.getElementById('sidebar').classList.remove('active'); 
+        document.getElementById('overlay').style.display = 'none'; 
+    }
+
+    window.handleAuth = () => { 
+        if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { 
+            document.getElementById('adm-btn').style.display = "block"; 
+            closeAll(); 
+        } else { alert("Acesso Negado!"); } 
+    }
+
+    window.addCarrinho = (i) => {
+        const p = produtos[i];
+        const jaTem = carrinho.find(item => item.nome === p.nome);
+        if(jaTem) jaTem.qtd++; else carrinho.push({...p, qtd: 1});
+        document.getElementById('toast').style.display = 'block';
+        setTimeout(() => document.getElementById('toast').style.display = 'none', 1500);
+        atualizarCarrinhoUI();
+    }
+
+    // Outras funções mantidas
+    window.toggleCart = () => { 
+        const s = document.getElementById('sidebar');
+        s.classList.toggle('active');
+        document.getElementById('overlay').style.display = s.classList.contains('active') ? 'block' : 'none';
+    }
     window.aplicarCupom = () => {
         const c = document.getElementById('cupom-input').value.trim().toUpperCase();
         const isAdmin = document.getElementById('adm-btn').style.display === "block";
@@ -226,47 +262,17 @@
         document.getElementById('btn-aplicar').disabled = true;
         atualizarCarrinhoUI();
     }
-
-    window.addCarrinho = (i) => {
-        const p = produtos[i];
-        const jaTem = carrinho.find(item => item.nome === p.nome);
-        if(jaTem) jaTem.qtd++; else carrinho.push({...p, qtd: 1});
-        document.getElementById('toast').style.display = 'block';
-        setTimeout(() => document.getElementById('toast').style.display = 'none', 1500);
-        atualizarCarrinhoUI();
-    }
-
     window.mudarQtd = (i, n) => { carrinho[i].qtd += n; if(carrinho[i].qtd <= 0) carrinho.splice(i, 1); atualizarCarrinhoUI(); }
     window.removerCupom = () => { desconto = 0; document.getElementById('btn-remover').style.display = "none"; document.getElementById('btn-aplicar').disabled = false; atualizarCarrinhoUI(); }
+    window.abrirPainel = () => document.getElementById('painel-adm').style.display='block';
+    window.fecharPainel = () => document.getElementById('painel-adm').style.display='none';
+    window.irParaPedidos = () => { document.getElementById('view-loja').style.display='none'; document.getElementById('view-pedidos').style.display='block'; }
+    window.voltarLoja = () => { document.getElementById('view-loja').style.display='block'; document.getElementById('view-pedidos').style.display='none'; }
     window.adicionarProduto = () => {
         const n = document.getElementById('new-name').value; const p = parseFloat(document.getElementById('new-price').value); const i = document.getElementById('new-img').value;
         if(n && p) { produtos.push({nome:n, preco:p, img:i}); set(produtosRef, produtos); }
     }
     window.removerProduto = (i) => { if(confirm("Apagar?")) { produtos.splice(i, 1); set(produtosRef, produtos); } }
-    window.handleAuth = () => { if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { document.getElementById('adm-btn').style.display = "block"; closeAll(); } else { alert("Erro!"); } }
-    window.openAuth = () => { document.getElementById('modal-auth').style.display='block'; document.getElementById('overlay').style.display='block'; }
-    window.toggleCart = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; }
-    window.closeAll = () => { document.getElementById('modal-auth').style.display='none'; document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display='none'; }
-    window.abrirPainel = () => document.getElementById('painel-adm').style.display='block';
-    window.fecharPainel = () => document.getElementById('painel-adm').style.display='none';
-    window.irParaPedidos = () => { document.getElementById('view-loja').style.display='none'; document.getElementById('view-pedidos').style.display='block'; }
-    window.voltarLoja = () => { document.getElementById('view-loja').style.display='block'; document.getElementById('view-pedidos').style.display='none'; }
-    window.buscarPedido = function() {
-        const emailKey = document.getElementById('search-email').value.trim().toLowerCase().replace(/\./g, '_');
-        const res = document.getElementById('status-resultado');
-        if(!emailKey) return alert("Digite o e-mail.");
-        get(child(ref(db), `pedidos/${emailKey}`)).then((snap) => {
-            res.style.display = "block";
-            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; res.style.color = "#166534"; }
-            else { res.innerHTML = "❌ Pedido não encontrado."; res.style.background = "#fee2e2"; res.style.color = "#991b1b"; }
-        });
-    }
-    window.atualizarStatusPedido = function() {
-        const emailKey = document.getElementById('status-user-email').value.trim().toLowerCase().replace(/\./g, '_');
-        const status = document.getElementById('status-user-txt').value;
-        if(!emailKey) return alert("E-mail vazio.");
-        set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => alert("Salvo!"));
-    }
     window.finalizarCompra = () => { window.location.href = `https://wa.me/556499923612?text=Olá! Fiz um pedido de R$ ${document.getElementById('total-val').innerText}`; }
 </script>
 </body>
