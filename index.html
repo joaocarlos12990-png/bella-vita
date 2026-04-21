@@ -28,13 +28,11 @@
         .card { background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; transition: 0.3s; }
         .card img { width: 100%; height: 180px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; }
 
-        /* BARRINHA DE BRINDE */
-        .area-brinde { padding: 15px 20px; background: #fff; border-bottom: 1px solid #eee; width: 100%; box-sizing: border-box; display: block !important; }
+        .area-brinde { padding: 15px 20px; background: #fff; border-bottom: 1px solid #eee; width: 100%; box-sizing: border-box; }
         .progress-container { background: #f0f0f0; border-radius: 50px; height: 12px; margin: 10px 0; overflow: hidden; border: 1px solid #eee; }
         .progress-bar { background: linear-gradient(90deg, var(--pink), #ff85a1); height: 100%; width: 0%; transition: 0.6s ease-in-out; }
         #brinde-msg { font-size: 11px; font-weight: 600; color: #444; }
 
-        /* MODAIS */
         .modal { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: white; padding: 30px; border-radius: 25px; 
@@ -45,21 +43,18 @@
         #overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.4); display: none; z-index: 1500; 
-            backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
         }
 
-        /* SIDEBAR CARRINHO */
         #sidebar { position: fixed; right: -100%; top: 0; width: 85%; max-width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; display: flex; flex-direction: column; }
         #sidebar.active { right: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
         .cart-footer { padding: 20px; border-top: 1px solid #eee; background: white; }
 
-        /* CHECKBOX TERMOS */
         .termos-box { display: flex; align-items: center; gap: 10px; margin: 15px 0; padding: 10px; background: #fdf2f4; border-radius: 10px; font-size: 12px; color: #555; }
         .termos-box input { width: 20px; height: 20px; cursor: pointer; accent-color: var(--pink); }
 
-        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .btn-main:disabled { background: #ccc !important; opacity: 0.6; cursor: not-allowed; }
 
         .item-carrinho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
@@ -68,7 +63,7 @@
         #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 30px; overflow-y: auto; box-sizing: border-box; }
         .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .section-pedidos { max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; display: none; }
-        footer { text-align: center; padding: 40px 20px; color: #888; font-size: 11px; line-height: 1.5; }
+        footer { text-align: center; padding: 40px 20px; color: #888; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -111,7 +106,7 @@
 
         <div class="termos-box">
             <input type="checkbox" id="check-termos" onchange="travaBotao()">
-            <label for="check-termos">Eu li e aceito os <a href="javascript:void(0)" onclick="openTermos()" style="color:var(--pink); font-weight:bold;">Termos e Condições</a></label>
+            <label for="check-termos">Aceito os <a href="javascript:void(0)" onclick="openTermos()" style="color:var(--pink); font-weight:bold;">Termos e Condições</a></label>
         </div>
 
         <button class="btn-main" id="btn-finalizar" style="background:var(--pix);" onclick="finalizarCompra()" disabled>FINALIZAR PIX</button>
@@ -122,21 +117,20 @@
 
 <div id="view-pedidos" class="section-pedidos">
     <h2>Acompanhar Pedido</h2>
-    <input type="email" id="search-email" class="input-field" placeholder="Digite seu e-mail">
+    <input type="email" id="search-email" class="input-field" placeholder="Seu e-mail">
     <button class="btn-main" onclick="buscarPedido()">BUSCAR STATUS</button>
     <div id="status-resultado" style="margin-top:20px; padding:15px; border-radius:10px; display:none;"></div>
-    <button class="btn-nav" onclick="voltarLoja()" style="margin-top: 20px; width: 100%;">Voltar para a Loja</button>
+    <button class="btn-nav" onclick="voltarLoja()" style="margin-top: 20px; width: 100%;">Voltar</button>
 </div>
 
 <div id="modal-termos" class="modal">
-    <h3 style="margin-top:0;">Termos e Condições</h3>
+    <h3>Termos e Condições</h3>
     <div style="font-size: 13px; color: #555;">
-        <p><b>1. Pagamentos:</b> Somente via Pix. O pedido só é processado após envio do comprovante no WhatsApp.</p>
-        <p><b>2. Estoque:</b> Itens no carrinho não garantem reserva. A reserva ocorre após o pagamento.</p>
-        <p><b>3. Trocas:</b> Apenas por defeito comprovado em até 7 dias após o recebimento.</p>
-        <p><b>4. Dados:</b> Seu e-mail é usado apenas para você rastrear seu pedido aqui no site.</p>
+        <p>1. Pagamentos somente via Pix.</p>
+        <p>2. Confirmação de pedido via WhatsApp.</p>
+        <p>3. Prazo de entrega contado após pagamento.</p>
     </div>
-    <button class="btn-main" onclick="closeAll()" style="margin-top:15px;">FECHAR E VOLTAR</button>
+    <button class="btn-main" onclick="closeAll()" style="margin-top:15px;">FECHAR</button>
 </div>
 
 <div id="modal-auth" class="modal">
@@ -171,10 +165,7 @@
     </div>
 </div>
 
-<footer>
-    &copy; 2026 Bella Vita Oficial.<br>
-    <a href="javascript:void(0)" onclick="openTermos()">Termos de Uso e Privacidade</a>
-</footer>
+<footer>&copy; 2026 Bella Vita Oficial.</footer>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -220,17 +211,16 @@
         const bar = document.getElementById('cart-progress');
         const msg = document.getElementById('brinde-msg');
         lista.innerHTML = ""; totalBruto = 0; let itens = 0;
+        
         carrinho.forEach((item, i) => {
             totalBruto += item.preco * item.qtd; itens += item.qtd;
             lista.innerHTML += `<div class="item-carrinho"><span>${item.nome} (x${item.qtd})</span><div><button class="qtd-btn" onclick="mudarQtd(${i},-1)">-</button> <button class="qtd-btn" onclick="mudarQtd(${i},1)">+</button></div></div>`;
         });
+
         let progresso = (totalBruto / 150) * 100;
         bar.style.width = Math.min(progresso, 100) + "%";
-        if(totalBruto < 150) {
-            msg.innerHTML = `Faltam <b>R$ ${(150 - totalBruto).toFixed(2)}</b> para liberar 7% OFF!`;
-        } else {
-            msg.innerHTML = `🎉 PARABÉNS! Use o cupom <b>BELLA7</b>!`;
-        }
+        msg.innerHTML = totalBruto < 150 ? `Faltam <b>R$ ${(150 - totalBruto).toFixed(2)}</b> para 7% OFF!` : `🎉 PARABÉNS! Use <b>BELLA7</b>!`;
+        
         const valorFinal = totalBruto - (totalBruto * (desconto / 100));
         totalTxt.innerText = valorFinal.toFixed(2).replace('.', ',');
         document.getElementById('cart-counter').innerText = itens;
@@ -243,12 +233,21 @@
         btn.disabled = !(check.checked && carrinho.length > 0);
     }
 
-    window.openAuth = () => { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
-    window.openTermos = () => { document.getElementById('modal-termos').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
-    window.closeAll = () => { document.getElementById('modal-auth').style.display = 'none'; document.getElementById('modal-termos').style.display = 'none'; document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; }
-    
-    window.handleAuth = () => { if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { document.getElementById('adm-btn').style.display = "block"; closeAll(); } else { alert("Senha incorreta!"); } }
-    
+    window.finalizarCompra = () => { 
+        if(!document.getElementById('check-termos').checked) return alert("Aceite os termos!");
+        
+        // --- MONTAGEM DA MENSAGEM DO WHATSAPP ---
+        let msgItens = "";
+        carrinho.forEach(item => {
+            msgItens += `%0A- ${item.nome} (Qtd: ${item.qtd})`;
+        });
+
+        const total = document.getElementById('total-val').innerText;
+        const textoZap = `Olá! Acabei de fazer um pedido na Bella Vita ✨%0A%0A*Produtos:*${msgItens}%0A%0A*Total:* R$ ${total}%0A%0AGostaria de combinar o pagamento!`;
+        
+        window.location.href = `https://wa.me/556499923612?text=${textoZap}`; 
+    }
+
     window.addCarrinho = (i) => {
         const p = produtos[i];
         const jaTem = carrinho.find(item => item.nome === p.nome);
@@ -257,32 +256,11 @@
         setTimeout(() => document.getElementById('toast').style.display = 'none', 1500);
         atualizarCarrinhoUI();
     }
-
-    window.toggleCart = () => { 
-        const s = document.getElementById('sidebar');
-        s.classList.toggle('active');
-        document.getElementById('overlay').style.display = s.classList.contains('active') ? 'block' : 'none';
-    }
-
-    window.aplicarCupom = () => {
-        const c = document.getElementById('cupom-input').value.trim().toUpperCase();
-        if (c === "BELLA7" && totalBruto >= 150) { desconto = 7; alert("Cupom aplicado!"); }
-        else if (c === "AMOVCFER") { desconto = 100; alert("Cupom 100% aplicado!"); }
-        else if (c === "FER5" || c === "BELLA5") { desconto = 5; alert("Cupom 5% aplicado!"); }
-        else { return alert("Cupom inválido ou valor mínimo não atingido!"); }
-        document.getElementById('btn-remover').style.display = "block";
-        document.getElementById('btn-aplicar').style.display = "none";
-        atualizarCarrinhoUI();
-    }
-
-    window.removerCupom = () => { 
-        desconto = 0; 
-        document.getElementById('btn-remover').style.display = "none"; 
-        document.getElementById('btn-aplicar').style.display = "block"; 
-        document.getElementById('cupom-input').value = "";
-        atualizarCarrinhoUI(); 
-    }
-
+    window.openAuth = () => { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
+    window.openTermos = () => { document.getElementById('modal-termos').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
+    window.closeAll = () => { document.getElementById('modal-auth').style.display = 'none'; document.getElementById('modal-termos').style.display = 'none'; document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; }
+    window.toggleCart = () => { const s = document.getElementById('sidebar'); s.classList.toggle('active'); document.getElementById('overlay').style.display = s.classList.contains('active') ? 'block' : 'none'; }
+    window.handleAuth = () => { if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { document.getElementById('adm-btn').style.display = "block"; closeAll(); } else { alert("Senha incorreta!"); } }
     window.mudarQtd = (i, n) => { carrinho[i].qtd += n; if(carrinho[i].qtd <= 0) carrinho.splice(i, 1); atualizarCarrinhoUI(); }
     window.abrirPainel = () => document.getElementById('painel-adm').style.display='block';
     window.fecharPainel = () => document.getElementById('painel-adm').style.display='none';
@@ -293,7 +271,17 @@
         if(n && p) { produtos.push({nome:n, preco:p, img:i}); set(produtosRef, produtos); }
     }
     window.removerProduto = (i) => { if(confirm("Apagar?")) { produtos.splice(i, 1); set(produtosRef, produtos); } }
-    
+    window.aplicarCupom = () => {
+        const c = document.getElementById('cupom-input').value.trim().toUpperCase();
+        if (c === "BELLA7" && totalBruto >= 150) { desconto = 7; alert("Cupom aplicado!"); }
+        else if (c === "AMOVCFER") { desconto = 100; alert("Cupom 100%!"); }
+        else if (c === "FER5" || c === "BELLA5") { desconto = 5; alert("Cupom 5%!"); }
+        else { return alert("Inválido!"); }
+        document.getElementById('btn-remover').style.display = "block";
+        document.getElementById('btn-aplicar').style.display = "none";
+        atualizarCarrinhoUI();
+    }
+    window.removerCupom = () => { desconto = 0; document.getElementById('btn-remover').style.display = "none"; document.getElementById('btn-aplicar').style.display = "block"; document.getElementById('cupom-input').value = ""; atualizarCarrinhoUI(); }
     window.buscarPedido = function() {
         const emailKey = document.getElementById('search-email').value.trim().toLowerCase().replace(/\./g, '_');
         const res = document.getElementById('status-resultado');
@@ -303,17 +291,10 @@
             else { res.innerHTML = "❌ Não encontrado."; res.style.background = "#fee2e2"; }
         });
     }
-
     window.atualizarStatusPedido = function() {
         const emailKey = document.getElementById('status-user-email').value.trim().toLowerCase().replace(/\./g, '_');
         const status = document.getElementById('status-user-txt').value;
         set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => alert("Salvo!"));
-    }
-
-    window.finalizarCompra = () => { 
-        if(!document.getElementById('check-termos').checked) return alert("Aceite os termos!");
-        const total = document.getElementById('total-val').innerText;
-        window.location.href = `https://wa.me/556499923612?text=Olá! Acabei de fazer um pedido no site Bella Vita no valor de R$ ${total}. Quero combinar o pagamento!`; 
     }
 </script>
 </body>
