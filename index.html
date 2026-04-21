@@ -28,44 +28,45 @@
         .card { background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; transition: 0.3s; }
         .card img { width: 100%; height: 180px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; }
 
-        /* AREA DO BRINDE - AJUSTADA PARA CELULAR */
         .area-brinde { padding: 15px 20px; background: #fff; border-bottom: 1px solid #eee; width: 100%; box-sizing: border-box; }
         .progress-container { background: #f0f0f0; border-radius: 50px; height: 12px; margin: 10px 0; overflow: hidden; border: 1px solid #eee; }
         .progress-bar { background: linear-gradient(90deg, var(--pink), #ff85a1); height: 100%; width: 0%; transition: 0.6s ease-in-out; }
         #brinde-msg { font-size: 11px; font-weight: 600; color: #444; }
 
-        /* MODAL LOGIN (ESCONDIDO) */
         .modal { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: white; padding: 30px; border-radius: 25px; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.3); z-index: 3000; 
-            width: 90%; max-width: 350px; display: none;
+            width: 90%; max-width: 400px; display: none; max-height: 80vh; overflow-y: auto;
         }
 
-        /* OVERLAY SEM BORRÃO */
         #overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.4); display: none; z-index: 1500; 
             backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
         }
 
-        /* PAINEL ADM */
-        #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 30px; overflow-y: auto; box-sizing: border-box; }
-
-        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-
-        /* SIDEBAR CARRINHO */
         #sidebar { position: fixed; right: -100%; top: 0; width: 85%; max-width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; display: flex; flex-direction: column; }
         #sidebar.active { right: 0; }
+        
         .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
         .cart-footer { padding: 20px; border-top: 1px solid #eee; background: white; }
 
+        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .btn-main:disabled { background: #ccc !important; cursor: not-allowed; }
+        
+        .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 12px; color: #666; text-align: left; }
+        .checkbox-container input { width: 18px; height: 18px; accent-color: var(--pink); }
+
+        footer { text-align: center; padding: 40px 20px; color: #888; font-size: 12px; }
+        footer a { color: var(--pink); text-decoration: none; font-weight: bold; }
+
         .item-carrinho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
         .qtd-btn { background: #eee; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
-        
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 9999; }
+        #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 30px; overflow-y: auto; box-sizing: border-box; }
+        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .section-pedidos { max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; display: none; }
     </style>
 </head>
@@ -97,7 +98,7 @@
     </div>
     <div class="cart-items" id="lista-carrinho"></div>
     <div class="cart-footer">
-        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (BELLA7)">
+        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (Ex: BELLA7)">
         <div style="display: flex; gap: 5px; margin-bottom: 10px;">
             <button class="btn-nav" style="flex: 2; height: 40px;" id="btn-aplicar" onclick="aplicarCupom()">Aplicar</button>
             <button class="btn-nav" style="flex: 1; height: 40px; border-color: #999; color: #999; display: none;" id="btn-remover" onclick="removerCupom()">Tirar</button>
@@ -106,7 +107,13 @@
             <span>Total:</span>
             <b style="font-size: 20px; color: var(--pink);">R$ <span id="total-val">0,00</span></b>
         </div>
-        <button class="btn-main" style="background:var(--pix);" onclick="finalizarCompra()">FINALIZAR PIX</button>
+
+        <label class="checkbox-container">
+            <input type="checkbox" id="aceito-termos" onchange="validarTermos()">
+            <span>Eu aceito os <a href="javascript:void(0)" onclick="openTermos()">Termos e Condições</a></span>
+        </label>
+
+        <button class="btn-main" id="btn-finalizar" style="background:var(--pix);" onclick="finalizarCompra()" disabled>FINALIZAR PIX</button>
     </div>
 </div>
 
@@ -120,12 +127,23 @@
     <button class="btn-nav" onclick="voltarLoja()" style="margin-top: 20px; width: 100%;">Voltar para a Loja</button>
 </div>
 
+<div id="modal-termos" class="modal">
+    <h3 style="margin-top:0;">Termos e Condições</h3>
+    <div style="font-size: 13px; line-height: 1.6; color: #555; text-align: justify;">
+        <p><b>1. Pedidos:</b> Todos os pedidos são finalizados via WhatsApp. A disponibilidade dos itens é confirmada no momento do atendimento.</p>
+        <p><b>2. Pagamento:</b> Aceitamos Pix. O envio do comprovante é obrigatório para processar o pedido.</p>
+        <p><b>3. Entrega:</b> O prazo de entrega começa a contar após a confirmação do pagamento.</p>
+        <p><b>4. Trocas:</b> Realizamos trocas apenas em caso de defeito de fabricação informado em até 7 dias.</p>
+        <p><b>5. Privacidade:</b> Seus dados de e-mail são usados apenas para consulta de status do pedido.</p>
+    </div>
+    <button class="btn-main" onclick="closeAll()" style="margin-top:20px;">FECHAR</button>
+</div>
+
 <div id="modal-auth" class="modal">
     <h2 style="text-align: center; margin-top: 0;">Login ADM</h2>
     <input type="email" id="auth-email" class="input-field" placeholder="E-mail">
     <input type="password" id="auth-pass" class="input-field" placeholder="Senha">
     <button class="btn-main" onclick="handleAuth()">ENTRAR</button>
-    <button class="btn-nav" onclick="closeAll()" style="width:100%; border:none; margin-top:10px;">Cancelar</button>
 </div>
 
 <div id="painel-adm">
@@ -152,6 +170,11 @@
         <button class="btn-main" style="background:#333;" onclick="atualizarStatusPedido()">SALVAR STATUS</button>
     </div>
 </div>
+
+<footer>
+    &copy; 2026 Bella Vita Oficial.<br>
+    <a href="javascript:void(0)" onclick="openTermos()">Termos e Condições</a>
+</footer>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -197,30 +220,39 @@
         const bar = document.getElementById('cart-progress');
         const msg = document.getElementById('brinde-msg');
         lista.innerHTML = ""; totalBruto = 0; let itens = 0;
-        
         carrinho.forEach((item, i) => {
             totalBruto += item.preco * item.qtd; itens += item.qtd;
             lista.innerHTML += `<div class="item-carrinho"><span>${item.nome} (x${item.qtd})</span><div><button class="qtd-btn" onclick="mudarQtd(${i},-1)">-</button> <button class="qtd-btn" onclick="mudarQtd(${i},1)">+</button></div></div>`;
         });
-
         let progresso = (totalBruto / 150) * 100;
         bar.style.width = Math.min(progresso, 100) + "%";
         if(totalBruto < 150) {
             msg.innerHTML = `Faltam <b>R$ ${(150 - totalBruto).toFixed(2)}</b> para liberar 7% OFF!`;
-            msg.style.color = "#444";
         } else {
             msg.innerHTML = `🎉 PARABÉNS! Use o cupom <b>BELLA7</b>!`;
-            msg.style.color = "var(--pink)";
         }
         const valorFinal = totalBruto - (totalBruto * (desconto / 100));
         totalTxt.innerText = valorFinal.toFixed(2).replace('.', ',');
         document.getElementById('cart-counter').innerText = itens;
+        validarTermos(); // Revalida o botão ao mudar o carrinho
+    }
+
+    window.validarTermos = () => {
+        const aceito = document.getElementById('aceito-termos').checked;
+        const btn = document.getElementById('btn-finalizar');
+        btn.disabled = !(aceito && carrinho.length > 0);
     }
 
     window.openAuth = () => { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
-    window.closeAll = () => { document.getElementById('modal-auth').style.display = 'none'; document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; }
+    window.openTermos = () => { document.getElementById('modal-termos').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
+    window.closeAll = () => { 
+        document.getElementById('modal-auth').style.display = 'none'; 
+        document.getElementById('modal-termos').style.display = 'none';
+        document.getElementById('sidebar').classList.remove('active'); 
+        document.getElementById('overlay').style.display = 'none'; 
+    }
+
     window.handleAuth = () => { if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { document.getElementById('adm-btn').style.display = "block"; closeAll(); } else { alert("Erro!"); } }
-    
     window.addCarrinho = (i) => {
         const p = produtos[i];
         const jaTem = carrinho.find(item => item.nome === p.nome);
@@ -229,38 +261,38 @@
         setTimeout(() => document.getElementById('toast').style.display = 'none', 1500);
         atualizarCarrinhoUI();
     }
-
     window.toggleCart = () => { 
         const s = document.getElementById('sidebar');
         s.classList.toggle('active');
         document.getElementById('overlay').style.display = s.classList.contains('active') ? 'block' : 'none';
     }
-
     window.aplicarCupom = () => {
         const c = document.getElementById('cupom-input').value.trim().toUpperCase();
-        if (c === "BELLA7") {
-            if (totalBruto >= 150) { desconto = 7; alert("Cupom aplicado!"); } 
-            else { alert("Gaste mais R$ " + (150 - totalBruto).toFixed(2)); return; }
-        } else if (c === "AMOVCFER") { desconto = 100; } 
-        else { return alert("Cupom inválido!"); }
+        if (c === "BELLA7" && totalBruto >= 150) { desconto = 7; alert("Cupom aplicado!"); }
+        else if (c === "AMOVCFER") { desconto = 100; alert("Cupom especial aplicado!"); }
+        else if (c === "BELLA5" || c === "FER5") { desconto = 5; alert("Cupom de 5% aplicado!"); }
+        else { return alert("Cupom inválido ou valor insuficiente!"); }
         document.getElementById('btn-remover').style.display = "block";
-        document.getElementById('btn-aplicar').disabled = true;
+        document.getElementById('btn-aplicar').style.display = "none";
         atualizarCarrinhoUI();
     }
-
+    window.removerCupom = () => { 
+        desconto = 0; 
+        document.getElementById('btn-remover').style.display = "none"; 
+        document.getElementById('btn-aplicar').style.display = "block"; 
+        document.getElementById('cupom-input').value = "";
+        atualizarCarrinhoUI(); 
+    }
     window.mudarQtd = (i, n) => { carrinho[i].qtd += n; if(carrinho[i].qtd <= 0) carrinho.splice(i, 1); atualizarCarrinhoUI(); }
-    window.removerCupom = () => { desconto = 0; document.getElementById('btn-remover').style.display = "none"; document.getElementById('btn-aplicar').disabled = false; atualizarCarrinhoUI(); }
     window.abrirPainel = () => document.getElementById('painel-adm').style.display='block';
     window.fecharPainel = () => document.getElementById('painel-adm').style.display='none';
     window.irParaPedidos = () => { document.getElementById('view-loja').style.display='none'; document.getElementById('view-pedidos').style.display='block'; }
     window.voltarLoja = () => { document.getElementById('view-loja').style.display='block'; document.getElementById('view-pedidos').style.display='none'; }
-    
     window.adicionarProduto = () => {
         const n = document.getElementById('new-name').value; const p = parseFloat(document.getElementById('new-price').value); const i = document.getElementById('new-img').value;
         if(n && p) { produtos.push({nome:n, preco:p, img:i}); set(produtosRef, produtos); }
     }
     window.removerProduto = (i) => { if(confirm("Apagar?")) { produtos.splice(i, 1); set(produtosRef, produtos); } }
-    
     window.buscarPedido = function() {
         const emailKey = document.getElementById('search-email').value.trim().toLowerCase().replace(/\./g, '_');
         const res = document.getElementById('status-resultado');
@@ -270,14 +302,15 @@
             else { res.innerHTML = "❌ Não encontrado."; res.style.background = "#fee2e2"; }
         });
     }
-
     window.atualizarStatusPedido = function() {
         const emailKey = document.getElementById('status-user-email').value.trim().toLowerCase().replace(/\./g, '_');
         const status = document.getElementById('status-user-txt').value;
         set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => alert("Salvo!"));
     }
-
-    window.finalizarCompra = () => { window.location.href = `https://wa.me/556499923612?text=Olá! Pedido de R$ ${document.getElementById('total-val').innerText}`; }
+    window.finalizarCompra = () => { 
+        const total = document.getElementById('total-val').innerText;
+        window.location.href = `https://wa.me/556499923612?text=Olá! Acabei de fazer um pedido no site no valor de R$ ${total}. Gostaria de combinar o pagamento!`; 
+    }
 </script>
 </body>
 </html>
