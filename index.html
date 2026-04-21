@@ -15,50 +15,30 @@
         }
 
         .logo { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--pink); text-decoration: none; font-weight: bold; }
-
         .nav-right { display: flex; gap: 8px; align-items: center; }
-
-        .btn-nav { 
-            background: none; border: 2px solid var(--pink); color: var(--pink); padding: 8px 12px; border-radius: 50px; 
-            cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.3s;
-        }
-
+        .btn-nav { background: none; border: 2px solid var(--pink); color: var(--pink); padding: 8px 12px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 12px; }
         #adm-btn { background: #333; color: white; border: none; display: none; }
-
-        .cart-btn { 
-            background: var(--pink); color: white; border: none; padding: 10px 15px; border-radius: 50px; 
-            cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; font-size: 14px;
-        }
+        .cart-btn { background: var(--pink); color: white; border: none; padding: 10px 15px; border-radius: 50px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
 
         .container { 
             max-width: 1200px; margin: 30px auto; display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; padding: 0 15px; 
         }
 
-        .card { 
-            background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; transition: 0.3s; 
-        }
-
+        .card { background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; }
         .card img { width: 100%; height: 180px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; }
 
-        /* Estilo da Seção Meus Pedidos */
-        .section-pedidos {
-            max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; display: none;
-        }
+        /* Barra de Brinde / Desconto */
+        .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; }
+        .progress-bar { background: var(--pink); height: 100%; width: 0%; transition: 0.5s; }
+        #brinde-msg { font-size: 12px; font-weight: bold; color: var(--pink); margin-bottom: 5px; }
 
-        .status-box {
-            margin-top: 20px; padding: 20px; border-radius: 15px; display: none;
-            background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 600;
-        }
+        /* Estilo da Seção Meus Pedidos */
+        .section-pedidos { max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; display: none; }
+        .status-box { margin-top: 20px; padding: 20px; border-radius: 15px; display: none; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 600; }
 
         /* Sidebar Carrinho */
-        #sidebar { 
-            position: fixed; right: -100%; top: 0; width: 100%; max-width: 380px; height: 100%; 
-            background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; 
-            z-index: 2000; display: flex; flex-direction: column; 
-        }
-
+        #sidebar { position: fixed; right: -100%; top: 0; width: 100%; max-width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; display: flex; flex-direction: column; }
         #sidebar.active { right: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
@@ -67,19 +47,11 @@
         .item-carrinho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
         .qtd-btn { background: #eee; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
 
-        .modal { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; 
-            padding: 30px; border-radius: 25px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); z-index: 3000; 
-            width: 90%; max-width: 350px; display: none; 
-        }
-
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(2px); }
-
         .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
         #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 30px; overflow-y: auto; }
-
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; display: none; z-index: 9999; }
     </style>
 </head>
@@ -100,7 +72,6 @@
 
 <div id="view-pedidos" class="section-pedidos">
     <h2>Acompanhar Pedido</h2>
-    <p style="font-size: 14px; color: #666;">Consulte o status da sua entrega:</p>
     <input type="email" id="search-email" class="input-field" placeholder="Digite seu e-mail">
     <button class="btn-main" onclick="buscarPedido()">BUSCAR STATUS</button>
     <div id="status-resultado" class="status-box"></div>
@@ -123,7 +94,6 @@
         <h1>Painel ADM</h1>
         <button class="btn-nav" onclick="fecharPainel()">Sair</button>
     </div>
-    
     <div style="background:#f9f9f9; padding:20px; border-radius:20px; margin: 20px 0;">
         <h3>Novo Produto</h3>
         <input type="text" id="new-name" class="input-field" placeholder="Nome">
@@ -132,14 +102,13 @@
         <button class="btn-main" onclick="adicionarProduto()">CADASTRAR</button>
         <div id="lista-adm-produtos" style="margin-top: 15px;"></div>
     </div>
-
     <div style="background:#fff5f7; padding:20px; border-radius:20px;">
-        <h3>Atualizar Pedido do Cliente</h3>
+        <h3>Atualizar Pedido</h3>
         <input type="email" id="status-user-email" class="input-field" placeholder="E-mail do Cliente">
         <select id="status-user-txt" class="input-field">
             <option value="Estamos preparando seu pedido com muito carinho! 📦">Preparando</option>
             <option value="Seu pedido já foi postado e está a caminho! 🚚">Enviado</option>
-            <option value="Pedido entregue! Esperamos que goste. ✨">Entregue</option>
+            <option value="Pedido entregue! ✨">Entregue</option>
         </select>
         <button class="btn-main" style="background:#333;" onclick="atualizarStatusPedido()">SALVAR STATUS</button>
     </div>
@@ -150,9 +119,18 @@
         <h2 style="margin:0;">Carrinho</h2>
         <button onclick="toggleCart()" style="border:none; background:none; font-size:24px;">✕</button>
     </div>
+    
+    <div style="padding: 15px 20px 0 20px;">
+        <div id="brinde-msg">Faltam R$ 150,00 para liberar 7% OFF!</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="cart-progress"></div>
+        </div>
+    </div>
+
     <div class="cart-items" id="lista-carrinho"></div>
+    
     <div class="cart-footer">
-        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom">
+        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (BELLA7 para +R$150)">
         <div style="display: flex; gap: 5px; margin-bottom: 15px;">
             <button class="btn-nav" style="flex: 2; height: 45px;" id="btn-aplicar" onclick="aplicarCupom()">Aplicar</button>
             <button class="btn-nav" style="flex: 1; height: 45px; border-color: #999; color: #999; display: none;" id="btn-remover" onclick="removerCupom()">Tirar</button>
@@ -185,6 +163,7 @@
     let produtos = [];
     let carrinho = [];
     let desconto = 0;
+    let totalBruto = 0;
 
     onValue(produtosRef, (snapshot) => {
         produtos = snapshot.val() || [];
@@ -202,45 +181,80 @@
         });
     }
 
-    // Busca de Pedidos
-    window.buscarPedido = function() {
-        const emailRaw = document.getElementById('search-email').value.trim();
-        const emailKey = emailRaw.toLowerCase().replace(/\./g, '_');
-        const res = document.getElementById('status-resultado');
+    window.atualizarCarrinhoUI = () => {
+        const lista = document.getElementById('lista-carrinho');
+        const totalTxt = document.getElementById('total-val');
+        const bar = document.getElementById('cart-progress');
+        const msg = document.getElementById('brinde-msg');
         
-        if(!emailRaw) return alert("Por favor, digite o e-mail.");
+        lista.innerHTML = ""; totalBruto = 0; let itens = 0;
+        
+        carrinho.forEach((item, i) => {
+            totalBruto += item.preco * item.qtd; itens += item.qtd;
+            lista.innerHTML += `<div class="item-carrinho"><span>${item.nome} (x${item.qtd})</span><div><button class="qtd-btn" onclick="mudarQtd(${i},-1)">-</button> <button class="qtd-btn" onclick="mudarQtd(${i},1)">+</button></div></div>`;
+        });
 
-        get(child(ref(db), `pedidos/${emailKey}`)).then((snapshot) => {
-            res.style.display = "block";
-            if (snapshot.exists()) {
-                res.innerHTML = `✅ ${snapshot.val().status}`;
-                res.style.background = "#f0fdf4"; res.style.color = "#166534";
+        // Lógica da Barra Progressiva
+        let progresso = (totalBruto / 150) * 100;
+        bar.style.width = Math.min(progresso, 100) + "%";
+        
+        if(totalBruto < 150) {
+            msg.innerHTML = `Faltam R$ ${(150 - totalBruto).toFixed(2)} para liberar 7% OFF!`;
+        } else {
+            msg.innerHTML = `🎉 PARABÉNS! Use o cupom BELLA7 para 7% de desconto!`;
+            msg.style.color = "#25d366";
+        }
+
+        const valorFinal = totalBruto - (totalBruto * (desconto / 100));
+        totalTxt.innerText = valorFinal.toFixed(2).replace('.', ',');
+        document.getElementById('cart-counter').innerText = itens;
+    }
+
+    window.aplicarCupom = () => {
+        const c = document.getElementById('cupom-input').value.trim().toUpperCase();
+        const isAdmin = document.getElementById('adm-btn').style.display === "block";
+
+        if (c === "BELLA7") {
+            if (totalBruto >= 150) {
+                desconto = 7;
+                alert("Cupom BELLA7 aplicado! 7% de desconto concedido.");
             } else {
-                res.innerHTML = "❌ Nenhum pedido encontrado para este e-mail.";
-                res.style.background = "#fee2e2"; res.style.color = "#991b1b";
+                alert("O cupom BELLA7 só pode ser usado em compras acima de R$ 150,00.");
+                return;
             }
+        } else if (c === "AMOVCFER" && isAdmin) { 
+            desconto = 100; 
+        } else if (c === "BELLA5" || c === "FER5") { 
+            desconto = 5; 
+        } else { 
+            return alert("Cupom inválido!"); 
+        }
+        
+        document.getElementById('btn-remover').style.display = "block";
+        document.getElementById('btn-aplicar').disabled = true;
+        atualizarCarrinhoUI();
+    }
+
+    // Funções de busca e ADM (Mantidas)
+    window.buscarPedido = function() {
+        const emailKey = document.getElementById('search-email').value.trim().toLowerCase().replace(/\./g, '_');
+        const res = document.getElementById('status-resultado');
+        if(!emailKey) return alert("Digite o e-mail.");
+        get(child(ref(db), `pedidos/${emailKey}`)).then((snap) => {
+            res.style.display = "block";
+            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; }
+            else { res.innerHTML = "❌ Pedido não encontrado."; res.style.background = "#fee2e2"; }
         });
     }
 
-    // Atualização ADM
     window.atualizarStatusPedido = function() {
-        const emailRaw = document.getElementById('status-user-email').value.trim();
-        const emailKey = emailRaw.toLowerCase().replace(/\./g, '_');
+        const emailKey = document.getElementById('status-user-email').value.trim().toLowerCase().replace(/\./g, '_');
         const status = document.getElementById('status-user-txt').value;
-        
-        if(!emailRaw) return alert("Digite o e-mail do cliente.");
-        
-        set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => {
-            alert("Status do pedido salvo!");
-            document.getElementById('status-user-email').value = "";
-        });
+        if(!emailKey) return alert("E-mail vazio.");
+        set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => alert("Salvo!"));
     }
 
-    // Navegação
-    window.irParaPedidos = () => { document.getElementById('view-loja').style.display='none'; document.getElementById('view-pedidos').style.display='block'; }
-    window.voltarLoja = () => { document.getElementById('view-loja').style.display='block'; document.getElementById('view-pedidos').style.display='none'; }
-
-    // Carrinho e Cupons (Mantidos)
+    // Funções Gerais
     window.addCarrinho = (i) => {
         const p = produtos[i];
         const jaTem = carrinho.find(item => item.nome === p.nome);
@@ -249,57 +263,21 @@
         setTimeout(() => document.getElementById('toast').style.display = 'none', 1500);
         atualizarCarrinhoUI();
     }
-
-    window.atualizarCarrinhoUI = () => {
-        const lista = document.getElementById('lista-carrinho');
-        const totalTxt = document.getElementById('total-val');
-        lista.innerHTML = ""; let total = 0; let itens = 0;
-        carrinho.forEach((item, i) => {
-            total += item.preco * item.qtd; itens += item.qtd;
-            lista.innerHTML += `<div class="item-carrinho"><span>${item.nome} (x${item.qtd})</span><div><button class="qtd-btn" onclick="mudarQtd(${i},-1)">-</button> <button class="qtd-btn" onclick="mudarQtd(${i},1)">+</button></div></div>`;
-        });
-        const valorFinal = total - (total * (desconto / 100));
-        totalTxt.innerText = valorFinal.toFixed(2).replace('.', ',');
-        document.getElementById('cart-counter').innerText = itens;
-    }
-
     window.mudarQtd = (i, n) => { carrinho[i].qtd += n; if(carrinho[i].qtd <= 0) carrinho.splice(i, 1); atualizarCarrinhoUI(); }
-
-    window.aplicarCupom = () => {
-        if (desconto > 0) return alert("Apenas um cupom por vez!");
-        const c = document.getElementById('cupom-input').value.trim().toUpperCase();
-        const isAdmin = document.getElementById('adm-btn').style.display === "block";
-        if (c === "AMOVCFER" && isAdmin) { desconto = 100; } 
-        else if (c === "BELLA5" || c === "FER5") { desconto = 5; }
-        else { return alert("Cupom inválido ou sem permissão ADM."); }
-        document.getElementById('btn-remover').style.display = "block";
-        document.getElementById('btn-aplicar').disabled = true;
-        atualizarCarrinhoUI();
-    }
-
     window.removerCupom = () => { desconto = 0; document.getElementById('btn-remover').style.display = "none"; document.getElementById('btn-aplicar').disabled = false; document.getElementById('cupom-input').value = ""; atualizarCarrinhoUI(); }
-
     window.adicionarProduto = () => {
-        const n = document.getElementById('new-name').value;
-        const p = parseFloat(document.getElementById('new-price').value);
-        const i = document.getElementById('new-img').value;
+        const n = document.getElementById('new-name').value; const p = parseFloat(document.getElementById('new-price').value); const i = document.getElementById('new-img').value;
         if(n && p) { produtos.push({nome:n, preco:p, img:i}); set(produtosRef, produtos); }
     }
-
     window.removerProduto = (i) => { if(confirm("Apagar?")) { produtos.splice(i, 1); set(produtosRef, produtos); } }
-
-    window.handleAuth = () => {
-        if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") {
-            document.getElementById('adm-btn').style.display = "block";
-            closeAll();
-        } else { alert("Acesso negado!"); }
-    }
-
+    window.handleAuth = () => { if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { document.getElementById('adm-btn').style.display = "block"; closeAll(); } else { alert("Erro!"); } }
     window.openAuth = () => { document.getElementById('modal-auth').style.display='block'; document.getElementById('overlay').style.display='block'; }
     window.toggleCart = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; }
     window.closeAll = () => { document.getElementById('modal-auth').style.display='none'; document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display='none'; }
     window.abrirPainel = () => document.getElementById('painel-adm').style.display='block';
     window.fecharPainel = () => document.getElementById('painel-adm').style.display='none';
+    window.irParaPedidos = () => { document.getElementById('view-loja').style.display='none'; document.getElementById('view-pedidos').style.display='block'; }
+    window.voltarLoja = () => { document.getElementById('view-loja').style.display='block'; document.getElementById('view-pedidos').style.display='none'; }
     window.finalizarCompra = () => { window.location.href = `https://wa.me/556499923612?text=Olá! Fiz um pedido de R$ ${document.getElementById('total-val').innerText}`; }
 </script>
 </body>
