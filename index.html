@@ -45,38 +45,41 @@
 </header>
 
 <div class="container" id="vitrine">
-    <p style="text-align: center; grid-column: 1/-1;">Carregando vitrine...</p>
+    <p style="text-align: center; grid-column: 1/-1;">Carregando produtos...</p>
 </div>
 
 <div id="modal-auth" class="modal">
-    <h2 style="text-align: center; color: var(--pink);">Acesso Restrito</h2>
+    <h2 style="text-align: center; color: var(--pink);">Login ADM</h2>
     <input type="email" id="auth-email" class="input-field" placeholder="E-mail ADM">
     <input type="password" id="auth-pass" class="input-field" placeholder="Senha">
-    <button class="btn-main" onclick="handleAuth()">LOGAR</button>
+    <button class="btn-main" onclick="handleAuth()">ENTRAR</button>
 </div>
 
 <div id="painel-adm">
     <div style="max-width: 800px; margin: 0 auto;">
-        <h1>Gerenciar Produtos</h1>
-        <button class="btn-nav" onclick="fecharPainel()">Sair do Painel</button>
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 20px 0;">
-            <h3>Adicionar à Nuvem</h3>
+        <h1>Painel de Controle</h1>
+        <button class="btn-nav" onclick="fecharPainel()">Voltar para a Loja</button>
+        
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid #ddd;">
+            <h3>Novo Produto</h3>
             <input type="text" id="new-name" class="input-field" placeholder="Nome do Produto">
-            <input type="number" id="new-price" class="input-field" placeholder="Preço (Ex: 29.90)">
-            <input type="text" id="new-img" class="input-field" placeholder="URL da Imagem">
-            <button class="btn-main" onclick="adicionarProduto()">CADASTRAR AGORA</button>
+            <input type="number" id="new-price" class="input-field" placeholder="Preço (Ex: 19.90)">
+            <input type="text" id="new-img" class="input-field" placeholder="Link da Imagem (URL)">
+            <button class="btn-main" onclick="adicionarProduto()">ADICIONAR À NUVEM</button>
         </div>
+
         <div id="lista-adm-produtos">
             </div>
     </div>
 </div>
 
 <div id="sidebar">
-    <h2>Carrinho</h2>
+    <h2>Seu Carrinho</h2>
     <div id="lista-carrinho" style="flex-grow: 1; overflow-y: auto;"></div>
     <hr>
     <p>Total: <b>R$ <span id="total-val">0,00</span></b></p>
-    <button class="btn-main" style="background: var(--pix);" onclick="finalizarCompra()">PAGAR COM PIX</button>
+    <button class="btn-main" style="background: var(--pix);" onclick="abrirPagamento()">FINALIZAR PIX</button>
+    <button class="btn-nav" style="width:100%; margin-top:10px; border:none;" onclick="closeAll()">Continuar Comprando</button>
 </div>
 
 <script type="module">
@@ -99,62 +102,62 @@
     let produtos = [];
     let carrinho = [];
 
-    // --- SINCRONIZAÇÃO TOTAL ---
+    // --- ESCUTA O FIREBASE EM TEMPO REAL ---
     onValue(produtosRef, (snapshot) => {
         produtos = snapshot.val() || [];
-        renderizarTudo();
+        renderizarLoja();
+        renderizarPainelAdm();
     });
 
-    window.renderizarTudo = function() {
+    window.renderizarLoja = function() {
         const vitrine = document.getElementById('vitrine');
-        const listaAdm = document.getElementById('lista-adm-produtos');
-        
-        if(vitrine) vitrine.innerHTML = "";
-        if(listaAdm) listaAdm.innerHTML = "<h3>Produtos Ativos no Painel</h3>";
-
+        if(!vitrine) return;
+        vitrine.innerHTML = "";
         produtos.forEach((p, i) => {
-            // Desenha na Loja
-            if(vitrine) {
-                vitrine.innerHTML += `
-                    <div class="card">
-                        <img src="${p.img || 'https://via.placeholder.com/150'}">
-                        <h3>${p.nome}</h3>
-                        <p>R$ ${Number(p.preco).toFixed(2)}</p>
-                        <button class="btn-main" onclick="addCarrinho(${i})">COMPRAR</button>
-                    </div>`;
-            }
-            // Desenha no Painel ADM
-            if(listaAdm) {
-                listaAdm.innerHTML += `
-                    <div class="item-adm-linha">
-                        <span>${p.nome} - R$ ${Number(p.preco).toFixed(2)}</span>
-                        <button onclick="removerProduto(${i})" style="color:red; border:none; background:none; cursor:pointer;">Excluir</button>
-                    </div>`;
-            }
+            vitrine.innerHTML += `
+                <div class="card">
+                    <img src="${p.img || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
+                    <h3>${p.nome}</h3>
+                    <p>R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</p>
+                    <button class="btn-main" onclick="addCarrinho(${i})">COMPRAR</button>
+                </div>`;
         });
     }
 
-    // --- FUNÇÕES DE PRODUTO ---
+    window.renderizarPainelAdm = function() {
+        const listaAdm = document.getElementById('lista-adm-produtos');
+        if(!listaAdm) return;
+        listaAdm.innerHTML = "<h3>Produtos Ativos</h3>";
+        produtos.forEach((p, i) => {
+            listaAdm.innerHTML += `
+                <div class="item-adm-linha">
+                    <span>${p.nome} - R$ ${Number(p.preco).toFixed(2)}</span>
+                    <button onclick="removerProduto(${i})" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">Excluir</button>
+                </div>`;
+        });
+    }
+
+    // --- FUNÇÕES DE PRODUTO (NUVEM) ---
     window.adicionarProduto = function() {
         const n = document.getElementById('new-name').value;
         const p = parseFloat(document.getElementById('new-price').value);
         const i = document.getElementById('new-img').value;
         
         if(n && p) {
-            produtos.push({ nome: n, preco: p, img: i || 'https://via.placeholder.com/150' });
+            produtos.push({ nome: n, preco: p, img: i });
             set(produtosRef, produtos);
             document.getElementById('new-name').value = "";
             document.getElementById('new-price').value = "";
             document.getElementById('new-img').value = "";
-        } else {
-            alert("Preencha nome e preço!");
-        }
+        } else { alert("Preencha o nome e o preço!"); }
     }
 
     window.removerProduto = function(index) {
-        if(confirm("Deseja mesmo excluir este produto?")) {
+        if(confirm(`Deseja mesmo apagar "${produtos[index].nome}"?`)) {
             produtos.splice(index, 1);
-            set(produtosRef, produtos);
+            set(produtosRef, produtos).then(() => {
+                alert("Produto removido com sucesso!");
+            });
         }
     }
 
@@ -166,9 +169,7 @@
             document.getElementById('adm-btn').style.display = "block";
             document.getElementById('user-display').innerText = "ADM Logado";
             closeAll();
-        } else {
-            alert("Acesso negado!");
-        }
+        } else { alert("Dados incorretos!"); }
     }
 
     // --- CARRINHO ---
@@ -176,6 +177,7 @@
         carrinho.push(produtos[i]);
         document.getElementById('cart-counter').innerText = carrinho.length;
         renderizarCarrinho();
+        toggleCart();
     }
 
     window.renderizarCarrinho = function() {
@@ -184,8 +186,11 @@
         lista.innerHTML = "";
         let total = 0;
         carrinho.forEach((item) => {
-            total += item.preco;
-            lista.innerHTML += `<p>${item.nome} - R$ ${item.preco.toFixed(2)}</p>`;
+            total += Number(item.preco);
+            lista.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span>${item.nome}</span>
+                <b>R$ ${item.preco.toFixed(2)}</b>
+            </div>`;
         });
         totalTxt.innerText = total.toFixed(2).replace('.', ',');
     }
@@ -194,13 +199,16 @@
     window.openAuth = () => { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
     window.abrirPainel = () => document.getElementById('painel-adm').style.display = 'block';
     window.fecharPainel = () => document.getElementById('painel-adm').style.display = 'none';
-    window.toggleCart = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; }
+    window.toggleCart = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').style.display = 'block'; }
     window.closeAll = () => {
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        document.getElementById('modal-auth').style.display = 'none';
         document.getElementById('sidebar').classList.remove('active');
         document.getElementById('overlay').style.display = 'none';
     }
-    window.finalizarCompra = () => alert("Chave PIX: fv3029483@gmail.com\nEnvie o comprovante no WhatsApp!");
+    window.abrirPagamento = () => {
+        const total = document.getElementById('total-val').innerText;
+        window.location.href = `https://wa.me/556499923612?text=Olá! Fiz o pagamento de R$ ${total} na Bella Vita. Segue comprovante:`;
+    }
 </script>
 
 </body>
