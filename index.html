@@ -71,8 +71,8 @@
     <div style="margin-top: auto; border-top: 1px solid #eee; padding-top: 15px;">
         <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (5%) ou ADM">
         <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-            <button class="btn-nav" style="flex: 1;" onclick="aplicarCupom()">Aplicar</button>
-            <button class="btn-nav" style="flex: 1; border-color: #999; color: #999;" onclick="removerCupom()">Remover</button>
+            <button class="btn-nav" style="flex: 2;" id="btn-aplicar" onclick="aplicarCupom()">Aplicar</button>
+            <button class="btn-nav" style="flex: 1; border-color: #999; color: #999; display: none;" id="btn-remover" onclick="removerCupom()">Tirar</button>
         </div>
         <p>Total: <b>R$ <span id="total-val">0,00</span></b></p>
         <button class="btn-main" style="background:var(--pix);" onclick="finalizarCompra()">FINALIZAR PIX</button>
@@ -128,7 +128,6 @@
         const p = produtos[i];
         const jaTem = carrinho.find(item => item.nome === p.nome);
         if(jaTem) jaTem.qtd++; else carrinho.push({...p, qtd: 1});
-        
         const toast = document.getElementById('toast');
         toast.style.display = 'block';
         setTimeout(() => toast.style.display = 'none', 2000);
@@ -166,17 +165,31 @@
     window.aplicarCupom = () => {
         const c = document.getElementById('cupom-input').value.trim().toUpperCase();
         const isAdmin = document.getElementById('adm-btn').style.display === "block";
-        if (c === "AMOR" && isAdmin) {
-            desconto = 100; alert("Cupom ADM Ativado! 100% OFF");
+        
+        if (desconto > 0) { alert("Você já está usando um cupom!"); return; }
+
+        if (c === "AMOVCFER" && isAdmin) {
+            desconto = 100;
         } else if (c === "BELLA5" || c === "FER5") {
-            desconto = 5; alert("5% de desconto aplicado!");
+            desconto = 5;
         } else {
-            desconto = 0; alert("Cupom inválido ou sem permissão ADM.");
+            alert("Cupom inválido ou permissão negada."); return;
         }
+        
+        document.getElementById('btn-remover').style.display = "block";
+        document.getElementById('btn-aplicar').disabled = true;
+        alert("Cupom aplicado com sucesso!");
         atualizarCarrinhoUI();
     }
 
-    window.removerCupom = () => { desconto = 0; document.getElementById('cupom-input').value = ""; atualizarCarrinhoUI(); }
+    window.removerCupom = () => {
+        desconto = 0;
+        document.getElementById('cupom-input').value = "";
+        document.getElementById('btn-remover').style.display = "none";
+        document.getElementById('btn-aplicar').disabled = false;
+        alert("Cupom removido.");
+        atualizarCarrinhoUI();
+    }
 
     window.adicionarProduto = () => {
         const n = document.getElementById('new-name').value;
