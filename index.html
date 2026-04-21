@@ -282,22 +282,22 @@ function renderizarCarrinho() {
         const e = document.getElementById('auth-email').value, s = document.getElementById('auth-pass').value;
         if(e === "feradm@gmail.com" && s === "27112010") {
             document.getElementById('adm-btn').style.display = "block";
-            document.getElementById('user-display').innerText = "ADM Logado";
-            closeAll();
-        } else { alert("Dados incorretos!"); }
-    }
+// Funções de Interface (Abrir e Fechar Janelas)
 window.abrirPainel = () => { document.getElementById('painel-adm').style.display = "block"; };
 window.fecharPainel = () => { document.getElementById('painel-adm').style.display = "none"; };
+
 window.toggleCart = () => { 
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
     if(sidebar) sidebar.classList.toggle('active');
-    if(overlay) overlay.style.display = 'block';
+    if(overlay) overlay.style.display = (sidebar.classList.contains('active')) ? 'block' : 'none';
 };
+
 window.openAuth = () => {
     document.getElementById('modal-auth').style.display = 'block';
     document.getElementById('overlay').style.display = 'block';
 };
+
 window.closeAll = () => {
     document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     const sidebar = document.getElementById('sidebar');
@@ -305,6 +305,7 @@ window.closeAll = () => {
     if(sidebar) sidebar.classList.remove('active');
     if(overlay) overlay.style.display = 'none';
 };
+
 </script>
 </body>
 </html>
