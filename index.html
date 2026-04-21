@@ -28,12 +28,29 @@
         .card { background: var(--white); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid #eee; }
         .card img { width: 100%; height: 180px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; }
 
-        /* Barra de Brinde / Desconto */
-        .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; }
-        .progress-bar { background: var(--pink); height: 100%; width: 0%; transition: 0.5s; }
-        #brinde-msg { font-size: 12px; font-weight: bold; color: var(--pink); margin-bottom: 5px; }
+        /* --- VISUAL DA BARRA DE BRINDE --- */
+        .area-brinde {
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .progress-container { 
+            background: #f0f0f0; 
+            border-radius: 50px; 
+            height: 12px; 
+            margin: 10px 0; 
+            overflow: hidden; 
+            border: 1px solid #eee;
+        }
+        .progress-bar { 
+            background: linear-gradient(90deg, var(--pink), #ff85a1); 
+            height: 100%; 
+            width: 0%; 
+            transition: 0.6s ease-in-out; 
+        }
+        #brinde-msg { font-size: 12px; font-weight: 600; color: #444; }
 
-        /* Estilo da Seção Meus Pedidos */
+        /* Seção Meus Pedidos */
         .section-pedidos { max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; display: none; }
         .status-box { margin-top: 20px; padding: 20px; border-radius: 15px; display: none; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 600; }
 
@@ -120,7 +137,7 @@
         <button onclick="toggleCart()" style="border:none; background:none; font-size:24px;">✕</button>
     </div>
     
-    <div style="padding: 15px 20px 0 20px;">
+    <div class="area-brinde">
         <div id="brinde-msg">Faltam R$ 150,00 para liberar 7% OFF!</div>
         <div class="progress-container">
             <div class="progress-bar" id="cart-progress"></div>
@@ -131,9 +148,9 @@
     
     <div class="cart-footer">
         <input type="text" id="cupom-input" class="input-field" placeholder="Cupom (BELLA7 para +R$150)">
-        <div style="display: flex; gap: 5px; margin-bottom: 15px;">
-            <button class="btn-nav" style="flex: 2; height: 45px;" id="btn-aplicar" onclick="aplicarCupom()">Aplicar</button>
-            <button class="btn-nav" style="flex: 1; height: 45px; border-color: #999; color: #999; display: none;" id="btn-remover" onclick="removerCupom()">Tirar</button>
+        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <button class="btn-nav" style="flex: 2; height: 40px;" id="btn-aplicar" onclick="aplicarCupom()">Aplicar</button>
+            <button class="btn-nav" style="flex: 1; height: 40px; border-color: #999; color: #999; display: none;" id="btn-remover" onclick="removerCupom()">Tirar</button>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <span>Total:</span>
@@ -194,15 +211,16 @@
             lista.innerHTML += `<div class="item-carrinho"><span>${item.nome} (x${item.qtd})</span><div><button class="qtd-btn" onclick="mudarQtd(${i},-1)">-</button> <button class="qtd-btn" onclick="mudarQtd(${i},1)">+</button></div></div>`;
         });
 
-        // Lógica da Barra Progressiva
+        // Atualização da Barra
         let progresso = (totalBruto / 150) * 100;
         bar.style.width = Math.min(progresso, 100) + "%";
         
         if(totalBruto < 150) {
-            msg.innerHTML = `Faltam R$ ${(150 - totalBruto).toFixed(2)} para liberar 7% OFF!`;
+            msg.innerHTML = `Faltam <b>R$ ${(150 - totalBruto).toFixed(2)}</b> para liberar 7% OFF!`;
+            msg.style.color = "#444";
         } else {
-            msg.innerHTML = `🎉 PARABÉNS! Use o cupom BELLA7 para 7% de desconto!`;
-            msg.style.color = "#25d366";
+            msg.innerHTML = `🎉 PARABÉNS! Use o cupom <b>BELLA7</b>!`;
+            msg.style.color = "var(--pink)";
         }
 
         const valorFinal = totalBruto - (totalBruto * (desconto / 100));
@@ -215,46 +233,17 @@
         const isAdmin = document.getElementById('adm-btn').style.display === "block";
 
         if (c === "BELLA7") {
-            if (totalBruto >= 150) {
-                desconto = 7;
-                alert("Cupom BELLA7 aplicado! 7% de desconto concedido.");
-            } else {
-                alert("O cupom BELLA7 só pode ser usado em compras acima de R$ 150,00.");
-                return;
-            }
-        } else if (c === "AMOVCFER" && isAdmin) { 
-            desconto = 100; 
-        } else if (c === "BELLA5" || c === "FER5") { 
-            desconto = 5; 
-        } else { 
-            return alert("Cupom inválido!"); 
-        }
+            if (totalBruto >= 150) { desconto = 7; alert("Cupom BELLA7 aplicado!"); } 
+            else { alert("Gaste mais R$ " + (150 - totalBruto).toFixed(2) + " para usar esse cupom!"); return; }
+        } else if (c === "AMOVCFER" && isAdmin) { desconto = 100; } 
+        else if (c === "BELLA5" || c === "FER5") { desconto = 5; }
+        else { return alert("Cupom inválido!"); }
         
         document.getElementById('btn-remover').style.display = "block";
         document.getElementById('btn-aplicar').disabled = true;
         atualizarCarrinhoUI();
     }
 
-    // Funções de busca e ADM (Mantidas)
-    window.buscarPedido = function() {
-        const emailKey = document.getElementById('search-email').value.trim().toLowerCase().replace(/\./g, '_');
-        const res = document.getElementById('status-resultado');
-        if(!emailKey) return alert("Digite o e-mail.");
-        get(child(ref(db), `pedidos/${emailKey}`)).then((snap) => {
-            res.style.display = "block";
-            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; }
-            else { res.innerHTML = "❌ Pedido não encontrado."; res.style.background = "#fee2e2"; }
-        });
-    }
-
-    window.atualizarStatusPedido = function() {
-        const emailKey = document.getElementById('status-user-email').value.trim().toLowerCase().replace(/\./g, '_');
-        const status = document.getElementById('status-user-txt').value;
-        if(!emailKey) return alert("E-mail vazio.");
-        set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => alert("Salvo!"));
-    }
-
-    // Funções Gerais
     window.addCarrinho = (i) => {
         const p = produtos[i];
         const jaTem = carrinho.find(item => item.nome === p.nome);
@@ -263,8 +252,10 @@
         setTimeout(() => document.getElementById('toast').style.display = 'none', 1500);
         atualizarCarrinhoUI();
     }
+
+    // Funções Auxiliares (Mesmas de antes)
     window.mudarQtd = (i, n) => { carrinho[i].qtd += n; if(carrinho[i].qtd <= 0) carrinho.splice(i, 1); atualizarCarrinhoUI(); }
-    window.removerCupom = () => { desconto = 0; document.getElementById('btn-remover').style.display = "none"; document.getElementById('btn-aplicar').disabled = false; document.getElementById('cupom-input').value = ""; atualizarCarrinhoUI(); }
+    window.removerCupom = () => { desconto = 0; document.getElementById('btn-remover').style.display = "none"; document.getElementById('btn-aplicar').disabled = false; atualizarCarrinhoUI(); }
     window.adicionarProduto = () => {
         const n = document.getElementById('new-name').value; const p = parseFloat(document.getElementById('new-price').value); const i = document.getElementById('new-img').value;
         if(n && p) { produtos.push({nome:n, preco:p, img:i}); set(produtosRef, produtos); }
@@ -278,6 +269,22 @@
     window.fecharPainel = () => document.getElementById('painel-adm').style.display='none';
     window.irParaPedidos = () => { document.getElementById('view-loja').style.display='none'; document.getElementById('view-pedidos').style.display='block'; }
     window.voltarLoja = () => { document.getElementById('view-loja').style.display='block'; document.getElementById('view-pedidos').style.display='none'; }
+    window.buscarPedido = function() {
+        const emailKey = document.getElementById('search-email').value.trim().toLowerCase().replace(/\./g, '_');
+        const res = document.getElementById('status-resultado');
+        if(!emailKey) return alert("Digite o e-mail.");
+        get(child(ref(db), `pedidos/${emailKey}`)).then((snap) => {
+            res.style.display = "block";
+            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; }
+            else { res.innerHTML = "❌ Pedido não encontrado."; res.style.background = "#fee2e2"; }
+        });
+    }
+    window.atualizarStatusPedido = function() {
+        const emailKey = document.getElementById('status-user-email').value.trim().toLowerCase().replace(/\./g, '_');
+        const status = document.getElementById('status-user-txt').value;
+        if(!emailKey) return alert("E-mail vazio.");
+        set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => alert("Salvo!"));
+    }
     window.finalizarCompra = () => { window.location.href = `https://wa.me/556499923612?text=Olá! Fiz um pedido de R$ ${document.getElementById('total-val').innerText}`; }
 </script>
 </body>
