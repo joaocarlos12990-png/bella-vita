@@ -259,7 +259,6 @@ function renderizarCarrinho() {
     let total = cupomAtivo ? subtotal * 0.95 : subtotal;
     if (totalVal) totalVal.innerText = total.toFixed(2).replace('.', ',');
 }
-   
 
     window.removerDoCarrinho = function(index) {
         carrinho.splice(index, 1);
@@ -287,13 +286,25 @@ function renderizarCarrinho() {
             closeAll();
         } else { alert("Dados incorretos!"); }
     }
-
-    window.abrirPainel = () => document.getElementById('painel-adm').style.display = "block";
-    window.fecharPainel = () => document.getElementById('painel-adm').style.display = "none";
-    window.toggleCart = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; }
-    window.openAuth = () => { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
-    window.closeAll = () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; }
+window.abrirPainel = () => { document.getElementById('painel-adm').style.display = "block"; };
+window.fecharPainel = () => { document.getElementById('painel-adm').style.display = "none"; };
+window.toggleCart = () => { 
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    if(sidebar) sidebar.classList.toggle('active');
+    if(overlay) overlay.style.display = 'block';
+};
+window.openAuth = () => {
+    document.getElementById('modal-auth').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+};
+window.closeAll = () => {
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    if(sidebar) sidebar.classList.remove('active');
+    if(overlay) overlay.style.display = 'none';
+};
 </script>
-
 </body>
 </html>
