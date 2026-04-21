@@ -30,6 +30,28 @@
         .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 40px; overflow-y: auto; }
+    /* Estilo do Aviso Flutuante */
+#toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4CAF50;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    z-index: 9999;
+    display: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; top: 0; }
+    20% { opacity: 1; top: 20px; }
+    80% { opacity: 1; top: 20px; }
+    100% { opacity: 0; top: 0; }
     </style>
 
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -37,6 +59,7 @@
 <meta http-equiv="Expires" content="0">
 </head>
 <body>
+<div id="toast">Produto adicionado com sucesso! ✅</div>
 
 <div id="overlay" onclick="closeAll()"></div>
 
@@ -144,7 +167,7 @@
                     <img src="${p.img}">
                     <h3>${p.nome}</h3>
                     <p>R$ ${p.preco.toFixed(2)}</p>
-                    <button class="btn-main" onclick="addAoCarrinho(${index})">COMPRAR</button>
+                   <button class="btn-main" onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">COMPRAR</button>
                 </div>`;
             
             adm.innerHTML += `
@@ -178,37 +201,76 @@
         }
     }
 
-    // Funções do Carrinho
-    window.addAoCarrinho = function(index) {
-        carrinho.push(produtos[index]);
-        atualizarCarrinho();
-        toggleCart();
+    window.adicionarAoCarrinho = function(nome, preco) {
+    const itemExistente = carrinho.find(item => item.nome === nome);
+
+    if (itemExistente) {
+        itemExistente.quantidade += 1;
+    } else {
+        carrinho.push({ nome, preco, quantidade: 1 });
     }
+
+    // MOSTRA O AVISO VERDE ✅
+    const toast = document.getElementById("toast");
+    if (toast) {
+        toast.style.display = "block";
+        setTimeout(() => { toast.style.display = "none"; }, 2000);
+    }
+
+    renderizarCarrinho();
+};
+
+window.alterarQuantidade = function(index, delta) {
+    if (carrinho[index].quantidade + delta > 0) {
+        carrinho[index].quantidade += delta;
+    } else {
+        carrinho.splice(index, 1);
+    }
+    renderizarCarrinho();
+};
+
+function renderizarCarrinho() {
+    const lista = document.getElementById("lista-carrinho");
+    const totalVal = document.getElementById("total-val");
+    const contador = document.getElementById("cart-counter");
+    if (!lista) return;
+    
+    lista.innerHTML = "";
+    let subtotal = 0;
+
+    carrinho.forEach((item, index) => {
+        subtotal += item.preco * item.quantidade;
+        lista.innerHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #333;">
+                <div>
+                    <strong style="display:block;">${item.nome}</strong>
+                    <span style="color: var(--pink);">R$ ${item.preco.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button onclick="alterarQuantidade(${index}, -1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; cursor:pointer; background:white; font-weight:bold;">-</button>
+                    <span style="font-weight:bold;">${item.quantidade}</span>
+                    <button onclick="alterarQuantidade(${index}, 1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; cursor:pointer; background:white; font-weight:bold;">+</button>
+                </div>
+            </div>
+        `;
+    });
+
+    if (contador) contador.innerText = carrinho.reduce((acc, i) => acc + i.quantidade, 0);
+    let total = cupomAtivo ? subtotal * 0.95 : subtotal;
+    if (totalVal) totalVal.innerText = total.toFixed(2).replace('.', ',');
+}
+   
 
     window.removerDoCarrinho = function(index) {
         carrinho.splice(index, 1);
         atualizarCarrinho();
     }
 
-    function atualizarCarrinho() {
-        const lista = document.getElementById('lista-carrinho');
-        let subtotal = 0;
         lista.innerHTML = "";
         carrinho.forEach((i, idx) => {
             subtotal += i.preco;
             lista.innerHTML += `<div class="item-row"><span>${i.nome}</span> <b>R$ ${i.preco.toFixed(2)}</b> <span onclick="removerDoCarrinho(${idx})" style="cursor:pointer; color:red;">✖</span></div>`;
-        });
-        document.getElementById('cart-counter').innerText = carrinho.length;
-        let total = cupomAtivo ? subtotal * 0.95 : subtotal;
-        document.getElementById('total-val').innerText = total.toFixed(2);
-    }
-
-    window.aplicarCupom = function() {
-        if(document.getElementById('cupom-input').value.toUpperCase() === "BELLA2026") {
-            cupomAtivo = true; atualizarCarrinho(); alert("Cupom de 5% aplicado!");
-        } else { alert("Cupom inválido!"); }
-    }
-
+       
     window.abrirPagamento = function() {
         const total = document.getElementById('total-val').innerText;
         document.getElementById('btn-comprovante').href = `https://wa.me/556499923612?text=Olá! Fiz o pagamento de R$ ${total} na Bella Vita. Segue comprovante:`;
