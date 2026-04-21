@@ -73,12 +73,19 @@
 </div>
 
 <div id="sidebar">
-    <h2>Carrinho</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">Carrinho</h2>
+        <button onclick="toggleCart()" style="background: none; border: none; font-size: 32px; color: var(--pink); cursor: pointer; padding: 5px 10px;">&times;</button>
+    </div>
+    
     <div class="cart-items" id="lista-carrinho"></div>
-    <input type="text" id="cupom-input" class="input-field" placeholder="Cupom: BELLA2026">
-    <button class="btn-main" style="padding: 10px; margin-bottom: 10px;" onclick="aplicarCupom()">Aplicar Cupom</button>
-    <p id="total-txt" style="font-size: 18px; font-weight: bold;">Total: R$ <span id="total-val">0,00</span></p>
-    <button class="btn-main" style="background: var(--pix);" onclick="abrirPagamento()">PAGAR COM PIX</button>
+    
+    <div style="margin-top: auto; padding-top: 20px;">
+        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom: BELLA2026">
+        <button class="btn-main" style="padding: 10px; margin-bottom: 10px;" onclick="aplicarCupom()">Aplicar Cupom</button>
+        <p id="total-txt" style="font-size: 18px; font-weight: bold;">Total: R$ <span id="total-val">0,00</span></p>
+        <button class="btn-main" style="background: var(--pix);" onclick="abrirPagamento()">PAGAR COM PIX</button>
+    </div>
 </div>
 
 <div id="modal-pix" class="modal">
