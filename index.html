@@ -34,19 +34,21 @@
         .progress-bar { background: linear-gradient(90deg, var(--pink), #ff85a1); height: 100%; width: 0%; transition: 0.6s ease-in-out; }
         #brinde-msg { font-size: 12px; font-weight: 600; color: #444; }
 
-        /* MODAL DE LOGIN */
+        /* --- CORREÇÃO DO LOGIN ADM (ESCONDIDO POR PADRÃO) --- */
         .modal { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: white; padding: 30px; border-radius: 25px; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.3); z-index: 3000; 
-            width: 90%; max-width: 350px; display: none;
+            width: 90%; max-width: 350px; display: none; 
         }
 
-        /* --- CORREÇÃO DO BORRADO (REMOVIDO O BLUR) --- */
+        /* --- CORREÇÃO DO BORRADO (REMOVIDO 100%) --- */
         #overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); /* Só escurece um pouco, sem borrar */
+            background: rgba(0,0,0,0.35); /* Escurece levemente o fundo */
             display: none; z-index: 1500; 
+            backdrop-filter: none !important; /* Remove qualquer borrão */
+            -webkit-backdrop-filter: none !important;
         }
 
         #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 30px; overflow-y: auto; box-sizing: border-box; }
@@ -54,6 +56,7 @@
         .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
+        /* Sidebar Carrinho */
         #sidebar { position: fixed; right: -100%; top: 0; width: 100%; max-width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; display: flex; flex-direction: column; }
         #sidebar.active { right: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
@@ -213,9 +216,32 @@
         document.getElementById('cart-counter').innerText = itens;
     }
 
-    window.openAuth = () => { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
-    window.closeAll = () => { document.getElementById('modal-auth').style.display = 'none'; document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; }
-    window.handleAuth = () => { if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { document.getElementById('adm-btn').style.display = "block"; closeAll(); } else { alert("Erro!"); } }
+    // --- FUNÇÕES DE INTERFACE ---
+    window.openAuth = () => { 
+        document.getElementById('modal-auth').style.display = 'block'; 
+        document.getElementById('overlay').style.display = 'block'; 
+    }
+
+    window.closeAll = () => { 
+        document.getElementById('modal-auth').style.display = 'none'; 
+        document.getElementById('sidebar').classList.remove('active'); 
+        document.getElementById('overlay').style.display = 'none'; 
+    }
+
+    window.toggleCart = () => { 
+        const s = document.getElementById('sidebar');
+        s.classList.toggle('active');
+        document.getElementById('overlay').style.display = s.classList.contains('active') ? 'block' : 'none';
+    }
+
+    window.handleAuth = () => { 
+        if(document.getElementById('auth-email').value === "feradm@gmail.com" && document.getElementById('auth-pass').value === "27112010") { 
+            document.getElementById('adm-btn').style.display = "block"; 
+            closeAll(); 
+        } else { alert("Senha incorreta!"); } 
+    }
+
+    // --- RESTANTE DAS FUNÇÕES (PRODUTOS/PEDIDOS) ---
     window.addCarrinho = (i) => {
         const p = produtos[i];
         const jaTem = carrinho.find(item => item.nome === p.nome);
@@ -224,19 +250,11 @@
         setTimeout(() => document.getElementById('toast').style.display = 'none', 1500);
         atualizarCarrinhoUI();
     }
-    window.toggleCart = () => { 
-        const s = document.getElementById('sidebar');
-        s.classList.toggle('active');
-        document.getElementById('overlay').style.display = s.classList.contains('active') ? 'block' : 'none';
-    }
     window.aplicarCupom = () => {
         const c = document.getElementById('cupom-input').value.trim().toUpperCase();
-        if (c === "BELLA7") {
-            if (totalBruto >= 150) { desconto = 7; alert("Cupom BELLA7 aplicado!"); } 
-            else { alert("Gaste mais R$ " + (150 - totalBruto).toFixed(2) + " para usar esse cupom!"); return; }
-        } else if (c === "AMOVCFER") { desconto = 100; } 
-        else if (c === "BELLA5" || c === "FER5") { desconto = 5; }
-        else { return alert("Cupom inválido!"); }
+        if (c === "BELLA7" && totalBruto >= 150) { desconto = 7; alert("Cupom aplicado!"); }
+        else if (c === "AMOVCFER") { desconto = 100; }
+        else { return alert("Inválido ou valor insuficiente!"); }
         document.getElementById('btn-remover').style.display = "block";
         document.getElementById('btn-aplicar').disabled = true;
         atualizarCarrinhoUI();
@@ -255,20 +273,18 @@
     window.buscarPedido = function() {
         const emailKey = document.getElementById('search-email').value.trim().toLowerCase().replace(/\./g, '_');
         const res = document.getElementById('status-resultado');
-        if(!emailKey) return alert("Digite o e-mail.");
         get(child(ref(db), `pedidos/${emailKey}`)).then((snap) => {
             res.style.display = "block";
-            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; res.style.color = "#166534"; }
-            else { res.innerHTML = "❌ Pedido não encontrado."; res.style.background = "#fee2e2"; res.style.color = "#991b1b"; }
+            if (snap.exists()) { res.innerHTML = `✅ ${snap.val().status}`; res.style.background = "#f0fdf4"; }
+            else { res.innerHTML = "❌ Não encontrado."; res.style.background = "#fee2e2"; }
         });
     }
     window.atualizarStatusPedido = function() {
         const emailKey = document.getElementById('status-user-email').value.trim().toLowerCase().replace(/\./g, '_');
         const status = document.getElementById('status-user-txt').value;
-        if(!emailKey) return alert("E-mail vazio.");
         set(ref(db, `pedidos/${emailKey}`), { status: status }).then(() => alert("Salvo!"));
     }
-    window.finalizarCompra = () => { window.location.href = `https://wa.me/556499923612?text=Olá! Fiz um pedido de R$ ${document.getElementById('total-val').innerText}`; }
+    window.finalizarCompra = () => { window.location.href = `https://wa.me/556499923612?text=Olá! Pedido de R$ ${document.getElementById('total-val').innerText}`; }
 </script>
 </body>
 </html>
