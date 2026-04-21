@@ -171,8 +171,8 @@
 
     window.aplicarCupom = () => {
         const c = document.getElementById('cupom-input').value.toUpperCase();
-        if(c === "BELLA10") desconto = 10;
-        else if(c === "FER20") desconto = 20;
+        if(c === "BELLA5") desconto = 5;
+        else if(c === "AMOR") desconto = 100;
         else { desconto = 0; alert("Cupom inválido!"); }
         atualizarCarrinhoUI();
     }
