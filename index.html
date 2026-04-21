@@ -7,32 +7,50 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #ff4d6d; --fundo: #fffafa; --white: #ffffff; --green: #25d366; --pix: #32bcad; }
-        body { font-family: 'Poppins', sans-serif; background: var(--fundo); margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background: var(--fundo); margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* Header */
         header { background: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
         .logo { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--pink); text-decoration: none; font-weight: bold; }
         .nav-right { display: flex; gap: 10px; align-items: center; }
-        .btn-nav { background: none; border: 2px solid var(--pink); color: var(--pink); padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-nav { background: none; border: 2px solid var(--pink); color: var(--pink); padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.3s; }
+        .btn-nav:hover { background: var(--pink); color: white; }
         #adm-btn { background: #333; color: white; border: none; display: none; }
-        .cart-btn { background: var(--pink); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        .cart-btn { background: var(--pink); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; position: relative; }
         
+        /* Vitrine */
         .container { max-width: 1200px; margin: 40px auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; padding: 0 20px; }
-        .card { background: var(--white); border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #eee; transition: 0.3s; }
+        .card { background: var(--white); border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #eee; transition: 0.4s; position: relative; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(255, 77, 109, 0.1); }
         .card img { width: 100%; height: 220px; object-fit: contain; border-radius: 15px; margin-bottom: 10px; }
         
-        #sidebar { position: fixed; right: -400px; top: 0; width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s; z-index: 2000; padding: 30px; display: flex; flex-direction: column; box-sizing: border-box; }
+        /* Carrinho Lateral */
+        #sidebar { position: fixed; right: -400px; top: 0; width: 380px; height: 100%; background: var(--white); box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); z-index: 2000; padding: 30px; display: flex; flex-direction: column; box-sizing: border-box; }
         #sidebar.active { right: 0; }
-        
+        .cart-items { flex-grow: 1; overflow-y: auto; margin-top: 20px; }
+        .item-carrinho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f5f5f5; }
+        .qtd-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-qtd { background: #f0f0f0; border: none; width: 25px; height: 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Modais e UI */
         .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 35px; border-radius: 25px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); z-index: 3000; width: 350px; display: none; }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(3px); }
-        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
+        .input-field { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
+        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-main:active { transform: scale(0.98); }
+
+        /* Painel ADM */
         #painel-adm { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; display: none; padding: 40px; overflow-y: auto; }
-        .item-adm-linha { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .item-adm-linha { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 10px; margin-bottom: 10px; }
+
+        /* Animação de Toast (Notificação) */
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 50px; font-weight: 600; display: none; z-index: 9999; animation: slideUp 0.4s; }
+        @keyframes slideUp { from { bottom: -50px; } to { bottom: 30px; } }
     </style>
 </head>
 <body>
 
+<div id="toast">Item adicionado! ✨</div>
 <div id="overlay" onclick="closeAll()"></div>
 
 <header>
@@ -45,7 +63,7 @@
 </header>
 
 <div class="container" id="vitrine">
-    <p style="text-align: center; grid-column: 1/-1;">Carregando produtos...</p>
+    <p style="text-align: center; grid-column: 1/-1;">Sincronizando com a nuvem...</p>
 </div>
 
 <div id="modal-auth" class="modal">
@@ -57,29 +75,36 @@
 
 <div id="painel-adm">
     <div style="max-width: 800px; margin: 0 auto;">
-        <h1>Painel de Controle</h1>
-        <button class="btn-nav" onclick="fecharPainel()">Voltar para a Loja</button>
+        <h1>Painel Bella Vita</h1>
+        <button class="btn-nav" onclick="fecharPainel()">Voltar para Loja</button>
         
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid #ddd;">
-            <h3>Novo Produto</h3>
+        <div style="background: #f9f9f9; padding: 25px; border-radius: 20px; margin: 30px 0; border: 1px solid #eee;">
+            <h3>Cadastrar Novo Item</h3>
             <input type="text" id="new-name" class="input-field" placeholder="Nome do Produto">
-            <input type="number" id="new-price" class="input-field" placeholder="Preço (Ex: 19.90)">
-            <input type="text" id="new-img" class="input-field" placeholder="Link da Imagem (URL)">
-            <button class="btn-main" onclick="adicionarProduto()">ADICIONAR À NUVEM</button>
+            <input type="number" id="new-price" class="input-field" placeholder="Preço (Ex: 15.90)">
+            <input type="text" id="new-img" class="input-field" placeholder="URL da Imagem">
+            <button class="btn-main" onclick="adicionarProduto()">CADASTRAR NA NUVEM</button>
         </div>
 
-        <div id="lista-adm-produtos">
-            </div>
+        <div id="lista-adm-produtos"></div>
     </div>
 </div>
 
 <div id="sidebar">
     <h2>Seu Carrinho</h2>
-    <div id="lista-carrinho" style="flex-grow: 1; overflow-y: auto;"></div>
-    <hr>
-    <p>Total: <b>R$ <span id="total-val">0,00</span></b></p>
-    <button class="btn-main" style="background: var(--pix);" onclick="abrirPagamento()">FINALIZAR PIX</button>
-    <button class="btn-nav" style="width:100%; margin-top:10px; border:none;" onclick="closeAll()">Continuar Comprando</button>
+    <div class="cart-items" id="lista-carrinho"></div>
+    
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #f5f5f5;">
+        <input type="text" id="cupom-input" class="input-field" placeholder="Cupom de Desconto">
+        <button class="btn-nav" style="width: 100%; margin-bottom: 15px;" onclick="aplicarCupom()">Aplicar Cupom</button>
+        
+        <p style="display: flex; justify-content: space-between; font-size: 18px;">
+            <span>Total:</span>
+            <b>R$ <span id="total-val">0,00</span></b>
+        </p>
+        <button class="btn-main" style="background: var(--pix);" onclick="finalizarCompra()">FINALIZAR COMPRA (PIX)</button>
+        <button class="btn-nav" style="width: 100%; border:none; margin-top:10px; color:#999;" onclick="limparCarrinho()">Limpar Carrinho</button>
+    </div>
 </div>
 
 <script type="module">
@@ -101,12 +126,13 @@
 
     let produtos = [];
     let carrinho = [];
+    let desconto = 0;
 
-    // --- ESCUTA O FIREBASE EM TEMPO REAL ---
+    // --- SINCRONIZAÇÃO NUVEM ---
     onValue(produtosRef, (snapshot) => {
         produtos = snapshot.val() || [];
         renderizarLoja();
-        renderizarPainelAdm();
+        renderizarAdm();
     });
 
     window.renderizarLoja = function() {
@@ -116,100 +142,148 @@
         produtos.forEach((p, i) => {
             vitrine.innerHTML += `
                 <div class="card">
-                    <img src="${p.img || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
+                    <img src="${p.img || 'https://via.placeholder.com/150'}">
                     <h3>${p.nome}</h3>
                     <p>R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</p>
-                    <button class="btn-main" onclick="addCarrinho(${i})">COMPRAR</button>
+                    <button class="btn-main" onclick="addCarrinho(${i})">ADICIONAR</button>
                 </div>`;
         });
     }
 
-    window.renderizarPainelAdm = function() {
-        const listaAdm = document.getElementById('lista-adm-produtos');
-        if(!listaAdm) return;
-        listaAdm.innerHTML = "<h3>Produtos Ativos</h3>";
+    window.renderizarAdm = function() {
+        const lista = document.getElementById('lista-adm-produtos');
+        if(!lista) return;
+        lista.innerHTML = "<h3>Gerenciar Itens Ativos</h3>";
         produtos.forEach((p, i) => {
-            listaAdm.innerHTML += `
+            lista.innerHTML += `
                 <div class="item-adm-linha">
-                    <span>${p.nome} - R$ ${Number(p.preco).toFixed(2)}</span>
-                    <button onclick="removerProduto(${i})" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">Excluir</button>
+                    <span><b>${p.nome}</b> - R$ ${p.preco}</span>
+                    <button onclick="removerProduto(${i})" style="color:red; border:none; background:none; cursor:pointer;">Remover</button>
                 </div>`;
         });
     }
 
-    // --- FUNÇÕES DE PRODUTO (NUVEM) ---
+    // --- FUNÇÕES ADM ---
     window.adicionarProduto = function() {
         const n = document.getElementById('new-name').value;
         const p = parseFloat(document.getElementById('new-price').value);
         const i = document.getElementById('new-img').value;
-        
         if(n && p) {
             produtos.push({ nome: n, preco: p, img: i });
             set(produtosRef, produtos);
             document.getElementById('new-name').value = "";
             document.getElementById('new-price').value = "";
-            document.getElementById('new-img').value = "";
-        } else { alert("Preencha o nome e o preço!"); }
-    }
-
-    window.removerProduto = function(index) {
-        if(confirm(`Deseja mesmo apagar "${produtos[index].nome}"?`)) {
-            produtos.splice(index, 1);
-            set(produtosRef, produtos).then(() => {
-                alert("Produto removido com sucesso!");
-            });
         }
     }
 
-    // --- LOGIN ---
+    window.removerProduto = function(index) {
+        if(confirm("Apagar este item definitivamente?")) {
+            produtos.splice(index, 1);
+            set(produtosRef, produtos);
+        }
+    }
+
     window.handleAuth = function() {
         const e = document.getElementById('auth-email').value;
         const s = document.getElementById('auth-pass').value;
         if(e === "feradm@gmail.com" && s === "27112010") {
             document.getElementById('adm-btn').style.display = "block";
-            document.getElementById('user-display').innerText = "ADM Logado";
+            document.getElementById('user-display').innerText = "Painel On";
             closeAll();
-        } else { alert("Dados incorretos!"); }
+        } else { alert("Acesso negado!"); }
     }
 
-    // --- CARRINHO ---
+    // --- SISTEMA DE CARRINHO (COM QTD) ---
     window.addCarrinho = function(i) {
-        carrinho.push(produtos[i]);
-        document.getElementById('cart-counter').innerText = carrinho.length;
-        renderizarCarrinho();
-        toggleCart();
+        const p = produtos[i];
+        const itemExistente = carrinho.find(item => item.nome === p.nome);
+        
+        if(itemExistente) {
+            itemExistente.qtd++;
+        } else {
+            carrinho.push({...p, qtd: 1});
+        }
+        
+        exibirToast();
+        atualizarCarrinhoUI();
     }
 
-    window.renderizarCarrinho = function() {
+    window.alterarQtd = function(index, delta) {
+        carrinho[index].qtd += delta;
+        if(carrinho[index].qtd <= 0) carrinho.splice(index, 1);
+        atualizarCarrinhoUI();
+    }
+
+    window.atualizarCarrinhoUI = function() {
         const lista = document.getElementById('lista-carrinho');
         const totalTxt = document.getElementById('total-val');
+        const badge = document.getElementById('cart-counter');
+        
         lista.innerHTML = "";
         let total = 0;
-        carrinho.forEach((item) => {
-            total += Number(item.preco);
-            lista.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <span>${item.nome}</span>
-                <b>R$ ${item.preco.toFixed(2)}</b>
-            </div>`;
+        let totalItens = 0;
+
+        carrinho.forEach((item, i) => {
+            const subtotal = item.preco * item.qtd;
+            total += subtotal;
+            totalItens += item.qtd;
+            lista.innerHTML += `
+                <div class="item-carrinho">
+                    <div>
+                        <div style="font-weight:600">${item.nome}</div>
+                        <div style="font-size:12px; color:#777">R$ ${item.preco.toFixed(2)}</div>
+                    </div>
+                    <div class="qtd-controls">
+                        <button class="btn-qtd" onclick="alterarQtd(${i}, -1)">-</button>
+                        <span>${item.qtd}</span>
+                        <button class="btn-qtd" onclick="alterarQtd(${i}, 1)">+</button>
+                    </div>
+                </div>`;
         });
-        totalTxt.innerText = total.toFixed(2).replace('.', ',');
+
+        const totalComDesconto = total - (total * (desconto / 100));
+        totalTxt.innerText = totalComDesconto.toFixed(2).replace('.', ',');
+        badge.innerText = totalItens;
+    }
+
+    window.aplicarCupom = function() {
+        const cupom = document.getElementById('cupom-input').value.toUpperCase();
+        if(cupom === "BELLA10") {
+            desconto = 10;
+            alert("Cupom BELLA10 aplicado! 10% de desconto.");
+        } else if(cupom === "FER20") {
+            desconto = 20;
+            alert("Cupom FER20 aplicado! 20% de desconto.");
+        } else {
+            desconto = 0;
+            alert("Cupom inválido.");
+        }
+        atualizarCarrinhoUI();
+    }
+
+    window.limparCarrinho = function() {
+        carrinho = [];
+        desconto = 0;
+        atualizarCarrinhoUI();
     }
 
     // --- INTERFACE ---
+    function exibirToast() {
+        const t = document.getElementById('toast');
+        t.style.display = "block";
+        setTimeout(() => t.style.display = "none", 2000);
+    }
+
+    window.toggleCart = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; }
     window.openAuth = () => { document.getElementById('modal-auth').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
+    window.closeAll = () => { document.getElementById('modal-auth').style.display = 'none'; document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; }
     window.abrirPainel = () => document.getElementById('painel-adm').style.display = 'block';
     window.fecharPainel = () => document.getElementById('painel-adm').style.display = 'none';
-    window.toggleCart = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').style.display = 'block'; }
-    window.closeAll = () => {
-        document.getElementById('modal-auth').style.display = 'none';
-        document.getElementById('sidebar').classList.remove('active');
-        document.getElementById('overlay').style.display = 'none';
-    }
-    window.abrirPagamento = () => {
+    
+    window.finalizarCompra = () => {
         const total = document.getElementById('total-val').innerText;
-        window.location.href = `https://wa.me/556499923612?text=Olá! Fiz o pagamento de R$ ${total} na Bella Vita. Segue comprovante:`;
+        window.location.href = `https://wa.me/556499923612?text=Olá! Quero finalizar meu pedido de R$ ${total}.`;
     }
 </script>
-
 </body>
 </html>
